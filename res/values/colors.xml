@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="black">#ff000000</color>
+    <color name="black_light">#ff5b5d5f</color>
+    <color name="black_transparent_back">#90000000</color>
+    <color name="sm_edge">#40000000</color>
+    <color name="half_transparent">#7F000000</color>
+    <color name="white">#ffffffff</color>
+    <color name="gray70">#ffb3b3b3</color>
+    <color name="gray70_transparent_back">#90b3b3b3</color>
+    <color name="background">#FFEFEFEF</color>
+    <color name="android_green">#FFA4C639</color>
+    <color name="honeycombish_blue">#FF58BAED</color>
+    <color name="rawsienna">#ffc76114</color>
+    <color name="green">#ff00ff00</color>
+    <color name="blue">#ff3b5998</color>
+    <color name="gray">#fff3f3f3</color>
+    <color name="BlueText">#ff0066ff</color>
+    <color name="red">#ffff0000</color>
+    <color name="silver">#ff956b28</color>
+    <color name="list_selected">#ffd9e6e7</color>
+    <color name="sp_answer">#ff3b5998</color>
+    <color name="product_name_color">#ff191919</color>
+    <color name="strike_color">#ffc93530</color>
+    <color name="product_price_color">#ff818181</color>
+    <color name="app_back_color">#ffd8dce4</color>
+    <color name="white_back_border">#ffc2c3c5</color>
+    <color name="item_code_color">#ff818181</color>
+    <color name="a2mc_terms_color">#ff525151</color>
+    <color name="tnc_title_color">#ff191919</color>
+    <color name="in_stock_color">#ff0fb53c</color>
+    <color name="no_stock_color">#ffe20604</color>
+    <color name="info_content_title_color">#ff637ba2</color>
+    <color name="delivery_selection_title_color">#ff5e6a7f</color>
+
+    <color name="background_holo_light">#fff3f3f3</color>
+</resources>
