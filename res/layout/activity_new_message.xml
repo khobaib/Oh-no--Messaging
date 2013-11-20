@@ -9,22 +9,11 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
+        android:background="@drawable/button_back"
         android:onClick="onClickInbox"
         android:padding="15dp"
         android:text="Inbox"
-        android:textSize="20dp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/b_discard"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:onClick="onClickDiscard"
-        android:padding="15dp"
-        android:text="Discard"
+        android:textColor="@drawable/button_text"
         android:textSize="20dp"
         android:textStyle="bold" />
 
@@ -35,11 +24,13 @@
         android:layout_alignLeft="@+id/b_inbox"
         android:layout_below="@+id/b_inbox"
         android:layout_marginTop="10dp"
+        android:paddingTop="5dp"
         android:text="To"
         android:textSize="20dp"
         android:textStyle="bold" />
 
-    <!-- <Button
+    <!--
+         <Button
         android:id="@+id/b_add_more"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
@@ -47,9 +38,27 @@
         android:layout_alignRight="@+id/b_discard"
         android:text="+"
         android:textSize="18dp"
-        android:textStyle="bold" /> -->
+        android:textStyle="bold" />
+    -->
 
-    <com.smartengine.ohnomessaging.utils.ContactsEditText
+    <com.smartengine.ohnomessaging.view.ContactsCompletionView
+        android:id="@+id/searchView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/tv_to"
+        android:layout_marginRight="10dp"
+        android:layout_toRightOf="@+id/tv_to"
+        android:ellipsize="end"
+        android:hint="Add contacts"
+        android:nextFocusDown="@+id/et_msg_body"
+        android:singleLine="true"
+        android:textColor="@android:color/black"
+        android:textSize="20dp" >
+    </com.smartengine.ohnomessaging.view.ContactsCompletionView>
+
+    <!--
+         <com.smartengine.ohnomessaging.view.ContactsEditText
         android:id="@+id/act_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,7 +70,8 @@
         android:inputType="textPersonName"
         android:singleLine="true"
         android:textSize="20dp" >
-    </com.smartengine.ohnomessaging.utils.ContactsEditText>
+    </com.smartengine.ohnomessaging.view.ContactsEditText>
+    -->
 
     <EditText
         android:id="@+id/et_msg_body"
@@ -69,7 +79,8 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/rl_send_to"
         android:layout_alignLeft="@+id/b_inbox"
-        android:layout_alignRight="@+id/b_discard"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
         android:hint="Write your message here"
         android:textSize="18dp" />
 

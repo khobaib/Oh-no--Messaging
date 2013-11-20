@@ -10,6 +10,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
+        android:background="@drawable/button_back"
+        android:textColor="@drawable/button_text"
         android:onClick="onClickNewMessage"
         android:padding="15dp"
         android:text="New Message"
