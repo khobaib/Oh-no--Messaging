@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -17,14 +18,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
 
 public class InboxActivity extends Activity {
+
+    private static final int BUTTON_POSITIVE = -1;
+    private static final int BUTTON_NEGATIVE = -2;
 
     //    private static final int TYPE_INCOMING_MESSAGE = 1;
     private ListView messageList;
@@ -41,18 +47,18 @@ public class InboxActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BugSenseHandler.initAndStartSession(this, Constants.BUGSENSE_API_KEY);
-        
+
         setContentView(R.layout.activity_inbox);
         initViews();
 
     }
-    
+
     @Override
     protected void onStart() {
         super.onStart();
         BugSenseHandler.startSession(this);
     }
-    
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -75,9 +81,9 @@ public class InboxActivity extends Activity {
         messageList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> parent, View b, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 TextMessage selectedMessage = (TextMessage) parent.getItemAtPosition(position);
-                            
+
                 Intent i = new Intent(InboxActivity.this, ContactSelectedNewMessageActivity.class);
                 i.putExtra(Constants.THREAD_ID, selectedMessage.getThreadId());
                 i.putExtra(Constants.DISPLAY_NAME, selectedMessage.getContactName());
@@ -87,9 +93,47 @@ public class InboxActivity extends Activity {
 
             }
         });
+        
+        messageList.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                TextMessage selectedMessage = (TextMessage) parent.getItemAtPosition(position);
+                
+                int threadId = selectedMessage.getThreadId();
+                showDeleteDialog(threadId);
+                return false;
+            }
+        });
 
 
         populateMessageList();
+    }
+
+
+    private void showDeleteDialog(final int threadId){
+
+
+        AlertDialog Alert = new AlertDialog.Builder(InboxActivity.this).create();                  
+        Alert.setTitle("Delete");
+        Alert.setMessage("Want to delete this text thread?"); 
+
+        Alert.setButton(BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+
+                Uri deleteUri = Uri.parse("content://sms");
+                getContentResolver().delete(deleteUri, "thread_id=" + threadId, null);
+                populateMessageList();
+            }
+        });
+
+        Alert.setButton(BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+            }
+        });            
+        Alert.show();
     }
 
     public void populateMessageList() {
@@ -198,7 +242,7 @@ public class InboxActivity extends Activity {
                 return true;
             }
         }
-//        threadIdList.add(threadId);
+        //        threadIdList.add(threadId);
         return false;
     }
 

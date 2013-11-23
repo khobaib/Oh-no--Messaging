@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
 import com.smartengine.ohnomessaging.adapter.ThreadMessageAdapter;
 import com.smartengine.ohnomessaging.model.TextMessage;
@@ -92,7 +93,7 @@ public class ContactSelectedNewMessageActivity extends Activity {
                 else{
                     for(String sendTo : phoneNumbers)
                         sendSMS(sendTo, msgBody);
-                    finish();
+//                    finish();
                 }
             }
         });
@@ -100,7 +101,8 @@ public class ContactSelectedNewMessageActivity extends Activity {
         threadId = getIntent().getExtras().getInt(Constants.THREAD_ID); 
         
         String contactName = getIntent().getExtras().getString(Constants.DISPLAY_NAME); 
-        tvSendTo.setText("Send to " + contactName);
+        tvSendTo.setVisibility(View.VISIBLE);
+        tvSendTo.setText("" + contactName);
         
         contactId = getIntent().getExtras().getInt(Constants.CONTACT_ID);
         otherUserPic = getContactPhoto(contactId);

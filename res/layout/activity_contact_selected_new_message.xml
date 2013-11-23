@@ -38,10 +38,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="10dp"
-        android:background="@drawable/send_to_back" >
+        android:layout_marginTop="5dp"
+        android:background="@drawable/button_back" >
 
         <ImageView
             android:id="@+id/iv_send_to"
@@ -58,9 +58,10 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:text="Send"
-            android:textColor="@android:color/black"
+            android:textColor="@drawable/button_text"
             android:textSize="18dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="invisible" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -18,7 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.smartengine.ohnomessaging.R;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Utility;
 

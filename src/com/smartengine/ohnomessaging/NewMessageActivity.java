@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.ContactsAdapter;
 import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.utils.Constants;
@@ -42,15 +43,15 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
     TextView tvSendTo;
     ImageView ivSendTo;
 
-//    ContactsEditText contactNos;
-    
+    //    ContactsEditText contactNos;
+
     ContactsCompletionView completionView;
     ContactsAdapter cAdapter;
     EditText MessageBody;
 
-//    String strContacts;
-//    List<String> phoneNumbers;
-    
+    //    String strContacts;
+    //    List<String> phoneNumbers;
+
     Bitmap defaultUserPic;
 
     int fromActivity;
@@ -65,10 +66,10 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
 
         setContentView(R.layout.activity_new_message);
 
-//        strContacts = null;
-//        phoneNumbers = new ArrayList<String>();
+        //        strContacts = null;
+        //        phoneNumbers = new ArrayList<String>();
         defaultUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture);
-        
+
         cAdapter = new ContactsAdapter(this);
 
         completionView = (ContactsCompletionView)findViewById(R.id.searchView);
@@ -77,11 +78,11 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
 
         if (savedInstanceState == null) {
             completionView.setPrefix("");
-//            completionView.addObject(people[0]);
-//            completionView.addObject(people[1]);
+            //            completionView.addObject(people[0]);
+            //            completionView.addObject(people[1]);
         }
 
-//        contactNos = (ContactsEditText) findViewById(R.id.act_to);
+        //        contactNos = (ContactsEditText) findViewById(R.id.act_to);
         MessageBody = (EditText) findViewById(R.id.et_msg_body);
 
         tvSendTo = (TextView) findViewById(R.id.tv_send_to);         
@@ -110,97 +111,97 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
         });
 
 
-//        contactNos.addTextChangedListener(new GenericTextWatcher(contactNos));
-//        contactNos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
-//                Contact contact = (Contact) parent.getItemAtPosition(position);
-//                phoneNumbers.add(contact.getPhoneNumber());               
-//                updateUI(contact.getDisplayName(), contact.getImage());
-//            }
-//        });
-//
-//        contactNos.setOnFocusChangeListener(new OnFocusChangeListener() {
-//
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if(hasFocus){
-//                    Log.e(">>>>>>", "has focus = true");
-//                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-//                    //                    et.requestFocus();
-//                }
-//                else{
-//                    Log.e(">>>>>>", "has focus = false");
-//                    if(contactNos.getText().toString().equals("")){
-//                        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(contactNos.getWindowToken(), 0);
-//                    }
-//                }
-//            }
-//        }); 
+        //        contactNos.addTextChangedListener(new GenericTextWatcher(contactNos));
+        //        contactNos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //            @Override
+        //            public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
+        //                Contact contact = (Contact) parent.getItemAtPosition(position);
+        //                phoneNumbers.add(contact.getPhoneNumber());               
+        //                updateUI(contact.getDisplayName(), contact.getImage());
+        //            }
+        //        });
+        //
+        //        contactNos.setOnFocusChangeListener(new OnFocusChangeListener() {
+        //
+        //            @Override
+        //            public void onFocusChange(View v, boolean hasFocus) {
+        //                if(hasFocus){
+        //                    Log.e(">>>>>>", "has focus = true");
+        //                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        //                    //                    et.requestFocus();
+        //                }
+        //                else{
+        //                    Log.e(">>>>>>", "has focus = false");
+        //                    if(contactNos.getText().toString().equals("")){
+        //                        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(contactNos.getWindowToken(), 0);
+        //                    }
+        //                }
+        //            }
+        //        }); 
     }
-    
-//    private void updateUI(String displayName, Bitmap image){
-//        if(strContacts == null)
-//            strContacts = "Send to " + displayName;
-//        else
-//            strContacts = strContacts + ", " + displayName;  
-//        
-//        if(phoneNumbers.size() == 1){
-//            ivSendTo.setImageBitmap(image);
-//        }
-//        else if(phoneNumbers.size() > 1){
-//            ivSendTo.setVisibility(View.INVISIBLE);
-//        }
-//
-//        tvSendTo.setText(strContacts);
-//    }
-    
+
+    //    private void updateUI(String displayName, Bitmap image){
+    //        if(strContacts == null)
+    //            strContacts = "Send to " + displayName;
+    //        else
+    //            strContacts = strContacts + ", " + displayName;  
+    //        
+    //        if(phoneNumbers.size() == 1){
+    //            ivSendTo.setImageBitmap(image);
+    //        }
+    //        else if(phoneNumbers.size() > 1){
+    //            ivSendTo.setVisibility(View.INVISIBLE);
+    //        }
+    //
+    //        tvSendTo.setText(strContacts);
+    //    }
 
 
-//    private class GenericTextWatcher implements TextWatcher{
-//
-//        private View view;
-//        private GenericTextWatcher(View view) {
-//            this.view = view;
-//        }
-//
-//        @Override
-//        public void afterTextChanged(Editable s) {
-//        }
-//
-//        @Override
-//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//        }
-//
-//        @Override
-//        public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            Log.e("???", "s, start, before, count = " + s + ", " + start + ", " + before + ", " + count);
-//            if(s.length() > start && s.charAt(start) == ','){
-//                Log.e(">>>>", "comma found");
-//                String insertedNumber = getLastPhoneNumber(s, start);
-//                if(insertedNumber != null && !insertedNumber.isEmpty()){
-//                    Log.e(">>>>", "inserted number not null");
-//                    phoneNumbers.add(insertedNumber);               
-//                    updateUI(insertedNumber, null);
-//                }
-//            }           
-//        }
-//
-//    }
-    
-//    private String getLastPhoneNumber(CharSequence s, int end){
-//        StringBuilder sb = new StringBuilder();
-//        for(int i = end-1; i >= 0; i--){
-//            Log.e(">>>>", "s.charAt." + i + "= " + s.charAt(i));
-//            if(s.charAt(i) == ',' )
-//                break;
-//            sb = sb.append(s.charAt(i));
-//        }
-//        sb = sb.reverse();
-//        String number = sb.toString().trim();
-//        return number;
-//    }
+
+    //    private class GenericTextWatcher implements TextWatcher{
+    //
+    //        private View view;
+    //        private GenericTextWatcher(View view) {
+    //            this.view = view;
+    //        }
+    //
+    //        @Override
+    //        public void afterTextChanged(Editable s) {
+    //        }
+    //
+    //        @Override
+    //        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    //
+    //        }
+    //
+    //        @Override
+    //        public void onTextChanged(CharSequence s, int start, int before, int count) {
+    //            Log.e("???", "s, start, before, count = " + s + ", " + start + ", " + before + ", " + count);
+    //            if(s.length() > start && s.charAt(start) == ','){
+    //                Log.e(">>>>", "comma found");
+    //                String insertedNumber = getLastPhoneNumber(s, start);
+    //                if(insertedNumber != null && !insertedNumber.isEmpty()){
+    //                    Log.e(">>>>", "inserted number not null");
+    //                    phoneNumbers.add(insertedNumber);               
+    //                    updateUI(insertedNumber, null);
+    //                }
+    //            }           
+    //        }
+    //
+    //    }
+
+    //    private String getLastPhoneNumber(CharSequence s, int end){
+    //        StringBuilder sb = new StringBuilder();
+    //        for(int i = end-1; i >= 0; i--){
+    //            Log.e(">>>>", "s.charAt." + i + "= " + s.charAt(i));
+    //            if(s.charAt(i) == ',' )
+    //                break;
+    //            sb = sb.append(s.charAt(i));
+    //        }
+    //        sb = sb.reverse();
+    //        String number = sb.toString().trim();
+    //        return number;
+    //    }
 
     @Override
     protected void onStart() {
@@ -257,8 +258,13 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
                         Toast.makeText(getBaseContext(), "Radio off", Toast.LENGTH_SHORT).show();
                         break;
                 }
-                unregisterReceiver(sentMessageReceiver);
-                NewMessageActivity.this.finish();
+
+                try{
+                    unregisterReceiver(sentMessageReceiver);
+                    NewMessageActivity.this.finish();
+                }catch (Exception e){
+                    Log.e("", "exception in unregistering broadcastreceiver");
+                }
             }
         };
 
@@ -299,36 +305,39 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
         //        Toast.makeText(NewMessageActivity.this, "Will go to Inbox", Toast.LENGTH_SHORT).show();
     }
 
-    
-  
-    
+
+
+
     private void updateUI(){
         String strContacts = null;
         if(completionView.getObjects().size() == 0){
-            strContacts = "Send ";  
+            strContacts = "Send";  
             ivSendTo.setImageBitmap(defaultUserPic);
+            tvSendTo.setVisibility(View.INVISIBLE);
         }
         else if(completionView.getObjects().size() == 1){
-            strContacts = "Send to " + ((Contact) completionView.getObjects().get(0)).getDisplayName();
+            strContacts = "" + ((Contact) completionView.getObjects().get(0)).getDisplayName();
             ivSendTo.setVisibility(View.VISIBLE);
             ivSendTo.setImageBitmap(((Contact) completionView.getObjects().get(0)).getImage());
+            tvSendTo.setVisibility(View.VISIBLE);
         }
         else if(completionView.getObjects().size() > 1){
             ivSendTo.setVisibility(View.GONE);
-            strContacts = "Send to "; 
+            strContacts = ""; 
             for (Object obj: completionView.getObjects()) {
                 Contact contact = (Contact)obj;
                 strContacts = strContacts + contact.getDisplayName() + ", ";
             }
             strContacts = Utility.trimLastComma(strContacts);
+            tvSendTo.setVisibility(View.VISIBLE);
         }
 
 
         tvSendTo.setText(strContacts);
     }
-    
-    
-    
+
+
+
 
     private void updateTokenConfirmation() {
         updateUI();
@@ -337,7 +346,7 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
 
     @Override
     public void onTokenAdded(Object token) {
-//        ((TextView)findViewById(R.id.lastEvent)).setText("Added: " + token);
+        //        ((TextView)findViewById(R.id.lastEvent)).setText("Added: " + token);
         Log.e("onTokenAdded", "Token Added");
         updateTokenConfirmation();
     }
@@ -345,7 +354,7 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
     @Override
     public void onTokenRemoved(Object token) {
         Log.e("onTokenAdded", "Token removed");
-//        ((TextView)findViewById(R.id.lastEvent)).setText("Removed: " + token);
+        //        ((TextView)findViewById(R.id.lastEvent)).setText("Removed: " + token);
         updateTokenConfirmation();
     }
 

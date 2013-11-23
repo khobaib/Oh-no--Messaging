@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.smartengine.ohnomessaging.R;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.model.Contact;
 
 /**

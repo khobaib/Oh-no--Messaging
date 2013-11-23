@@ -23,7 +23,7 @@ import android.util.AttributeSet;
 import android.widget.MultiAutoCompleteTextView;
 
 import com.bugsense.trace.Utils;
-import com.smartengine.ohnomessaging.R;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.ContactsAdapter;
 import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.utils.Utility;

@@ -38,7 +38,7 @@
         android:layout_alignRight="@+id/b_discard"
         android:text="+"
         android:textSize="18dp"
-        android:textStyle="bold" />
+        android:textStyle="bold" />
     -->
 
     <com.smartengine.ohnomessaging.view.ContactsCompletionView
@@ -50,7 +50,7 @@
         android:layout_marginRight="10dp"
         android:layout_toRightOf="@+id/tv_to"
         android:ellipsize="end"
-        android:hint="Add contacts"
+        android:hint="Recipient"
         android:nextFocusDown="@+id/et_msg_body"
         android:singleLine="true"
         android:textColor="@android:color/black"
@@ -70,7 +70,7 @@
         android:inputType="textPersonName"
         android:singleLine="true"
         android:textSize="20dp" >
-    </com.smartengine.ohnomessaging.view.ContactsEditText>
+    </com.smartengine.ohnomessaging.view.ContactsEditText>
     -->
 
     <EditText
@@ -81,7 +81,7 @@
         android:layout_alignLeft="@+id/b_inbox"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:hint="Write your message here"
+        android:hint="Enter message"
         android:textSize="18dp" />
 
     <RelativeLayout
@@ -91,16 +91,10 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="5dp"
+        android:minWidth="120dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
-        android:background="@drawable/send_to_back" >
-
-        <ImageView
-            android:id="@+id/iv_send_to"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_toRightOf="@+id/tv_send_to"
-            android:background="@drawable/ic_contact_picture" />
+        android:background="@drawable/button_back" >
 
         <TextView
             android:id="@+id/tv_send_to"
@@ -110,9 +104,17 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:text="Send"
-            android:textColor="@android:color/black"
+            android:textColor="@drawable/button_text"
             android:textSize="18dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/iv_send_to"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@+id/tv_send_to"
+            android:background="@drawable/ic_contact_picture" />
     </RelativeLayout>
 
 </RelativeLayout>

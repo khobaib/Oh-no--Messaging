@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.smartengine.ohnomessaging"
-    android:versionCode="12"
-    android:versionName="0.12" >
+    package="com.ohnomessaging"
+    android:versionCode="14"
+    android:versionName="0.14" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -17,11 +17,11 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_launcher4"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".NewMessageActivity"
+            android:name="com.smartengine.ohnomessaging.NewMessageActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" >
@@ -32,11 +32,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".InboxActivity"
+            android:name="com.smartengine.ohnomessaging.InboxActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ContactSelectedNewMessageActivity"
+            android:name="com.smartengine.ohnomessaging.ContactSelectedNewMessageActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" >
         </activity>
