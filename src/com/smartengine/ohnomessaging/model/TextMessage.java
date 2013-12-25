@@ -5,6 +5,7 @@ public class TextMessage {
     private String phoneNumber;
     private String contactName;
     private int contactId;
+    private int id;
     private int threadId;
     private int messaageType;
     private String messageBody;
@@ -15,11 +16,12 @@ public class TextMessage {
         // TODO Auto-generated constructor stub
     }
 
-    public TextMessage(String phoneNumber, String contactName, int contactId, int threadId, int messaageType,
+    public TextMessage(String phoneNumber, String contactName, int contactId, int id, int threadId, int messaageType,
             String messageBody, String timeOfMessage) {
         this.phoneNumber = phoneNumber;
         this.contactName = contactName;
         this.contactId = contactId;
+        this.id = id;
         this.threadId = threadId;
         this.messaageType = messaageType;
         this.messageBody = messageBody;
@@ -49,6 +51,14 @@ public class TextMessage {
 
     public void setContactId(int contactId) {
         this.contactId = contactId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getThreadId() {

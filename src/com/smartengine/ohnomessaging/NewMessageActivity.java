@@ -104,104 +104,20 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
                     for (Object obj: completionView.getObjects()) {
                         Contact contact = (Contact)obj;
                         String sendTo = contact.getPhoneNumber();
+                        
+                        ContentValues values = new ContentValues();
+                        values.put("address", sendTo);
+                        values.put("body", msgBody); 
+                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+                        
                         sendSMS(sendTo, msgBody);
                     }
                 }
             }
-        });
-
-
-        //        contactNos.addTextChangedListener(new GenericTextWatcher(contactNos));
-        //        contactNos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        //            @Override
-        //            public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
-        //                Contact contact = (Contact) parent.getItemAtPosition(position);
-        //                phoneNumbers.add(contact.getPhoneNumber());               
-        //                updateUI(contact.getDisplayName(), contact.getImage());
-        //            }
-        //        });
-        //
-        //        contactNos.setOnFocusChangeListener(new OnFocusChangeListener() {
-        //
-        //            @Override
-        //            public void onFocusChange(View v, boolean hasFocus) {
-        //                if(hasFocus){
-        //                    Log.e(">>>>>>", "has focus = true");
-        //                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-        //                    //                    et.requestFocus();
-        //                }
-        //                else{
-        //                    Log.e(">>>>>>", "has focus = false");
-        //                    if(contactNos.getText().toString().equals("")){
-        //                        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(contactNos.getWindowToken(), 0);
-        //                    }
-        //                }
-        //            }
-        //        }); 
+        }); 
     }
 
-    //    private void updateUI(String displayName, Bitmap image){
-    //        if(strContacts == null)
-    //            strContacts = "Send to " + displayName;
-    //        else
-    //            strContacts = strContacts + ", " + displayName;  
-    //        
-    //        if(phoneNumbers.size() == 1){
-    //            ivSendTo.setImageBitmap(image);
-    //        }
-    //        else if(phoneNumbers.size() > 1){
-    //            ivSendTo.setVisibility(View.INVISIBLE);
-    //        }
-    //
-    //        tvSendTo.setText(strContacts);
-    //    }
 
-
-
-    //    private class GenericTextWatcher implements TextWatcher{
-    //
-    //        private View view;
-    //        private GenericTextWatcher(View view) {
-    //            this.view = view;
-    //        }
-    //
-    //        @Override
-    //        public void afterTextChanged(Editable s) {
-    //        }
-    //
-    //        @Override
-    //        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    //
-    //        }
-    //
-    //        @Override
-    //        public void onTextChanged(CharSequence s, int start, int before, int count) {
-    //            Log.e("???", "s, start, before, count = " + s + ", " + start + ", " + before + ", " + count);
-    //            if(s.length() > start && s.charAt(start) == ','){
-    //                Log.e(">>>>", "comma found");
-    //                String insertedNumber = getLastPhoneNumber(s, start);
-    //                if(insertedNumber != null && !insertedNumber.isEmpty()){
-    //                    Log.e(">>>>", "inserted number not null");
-    //                    phoneNumbers.add(insertedNumber);               
-    //                    updateUI(insertedNumber, null);
-    //                }
-    //            }           
-    //        }
-    //
-    //    }
-
-    //    private String getLastPhoneNumber(CharSequence s, int end){
-    //        StringBuilder sb = new StringBuilder();
-    //        for(int i = end-1; i >= 0; i--){
-    //            Log.e(">>>>", "s.charAt." + i + "= " + s.charAt(i));
-    //            if(s.charAt(i) == ',' )
-    //                break;
-    //            sb = sb.append(s.charAt(i));
-    //        }
-    //        sb = sb.reverse();
-    //        String number = sb.toString().trim();
-    //        return number;
-    //    }
 
     @Override
     protected void onStart() {
@@ -214,13 +130,6 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
         super.onStop();
         BugSenseHandler.closeSession(this);
     }
-
-    //    @Override
-    //    public boolean onCreateOptionsMenu(Menu menu) {
-    //        // Inflate the menu; this adds items to the action bar if it is present.
-    //        getMenuInflater().inflate(R.menu.main, menu);
-    //        return true;
-    //    }
 
 
     private void sendSMS(final String phoneNumber, final String message){        
@@ -239,10 +148,10 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "SMS sent", Toast.LENGTH_SHORT).show();
 
-                        ContentValues values = new ContentValues();
-                        values.put("address", phoneNumber);
-                        values.put("body", message); 
-                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+//                        ContentValues values = new ContentValues();
+//                        values.put("address", phoneNumber);
+//                        values.put("body", message); 
+//                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
 
                         break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
@@ -269,30 +178,22 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
         };
 
         //---when the SMS has been sent---
-        registerReceiver(sentMessageReceiver, new IntentFilter(SENT));
-
-        //---when the SMS has been delivered---
-        //        registerReceiver(new BroadcastReceiver(){
-        //            @Override
-        //            public void onReceive(Context arg0, Intent arg1) {
-        //                switch (getResultCode())
-        //                {
-        //                    case Activity.RESULT_OK:
-        //                        Toast.makeText(getBaseContext(), "SMS delivered to " + phoneNumber, Toast.LENGTH_SHORT).show();
-        //                        break;
-        //                    case Activity.RESULT_CANCELED:
-        //                        Toast.makeText(getBaseContext(), "SMS not delivered to " + phoneNumber, Toast.LENGTH_SHORT).show();
-        //                        break;                        
-        //                }
-        //            }
-        //        }, new IntentFilter(DELIVERED));        
+        registerReceiver(sentMessageReceiver, new IntentFilter(SENT));      
 
         SmsManager sms = SmsManager.getDefault();
 
         int length = message.length();          
         if(length > MAX_SMS_MESSAGE_LENGTH) {
-            ArrayList<String> messagelist = sms.divideMessage(message);          
-            sms.sendMultipartTextMessage(phoneNumber, null, messagelist, null, null);
+            ArrayList<String> messagelist = sms.divideMessage(message);         
+            
+            ArrayList<PendingIntent> sendPIs = new ArrayList<PendingIntent>();
+            sendPIs.add(sentPI);
+            int msgCount = messagelist.size();
+            for(int i = 1; i < msgCount; i++){
+                sendPIs.add(null);
+            }
+            
+            sms.sendMultipartTextMessage(phoneNumber, null, messagelist, sendPIs, null);
         }
         else       
             sms.sendTextMessage(phoneNumber, null, message, sentPI, null);        
@@ -302,7 +203,6 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
         Intent i = new Intent(NewMessageActivity.this, InboxActivity.class);
         startActivity(i);
         finish();
-        //        Toast.makeText(NewMessageActivity.this, "Will go to Inbox", Toast.LENGTH_SHORT).show();
     }
 
 

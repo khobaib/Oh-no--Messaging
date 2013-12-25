@@ -197,8 +197,10 @@ public class InboxActivity extends Activity {
             c.moveToFirst();
             while (!c.isAfterLast()){
                 int threadId = c.getInt(c.getColumnIndexOrThrow("thread_id"));
+                Log.e(">>>>>>", "msgId = " + c.getInt(c.getColumnIndexOrThrow("_id")) + " AND msgBody = "
+                                    + c.getString(c.getColumnIndexOrThrow("body")));
                 if(!isThreadIdFound(threadId)){
-
+                    int id = c.getInt(c.getColumnIndexOrThrow("_id"));
                     String contactNumber = c.getString(c.getColumnIndexOrThrow("address"));
                     String messageBody = c.getString(c.getColumnIndexOrThrow("body"));                
                     int msgType = c.getInt(c.getColumnIndexOrThrow("type"));
@@ -208,7 +210,7 @@ public class InboxActivity extends Activity {
 
                     // initially contact-name = number to cover those contact who don't have name
                     // initially contactId = -1;
-                    TextMessage message = new TextMessage(contactNumber, null, -1, threadId, msgType, messageBody, date);
+                    TextMessage message = new TextMessage(contactNumber, null, -1, id, threadId, msgType, messageBody, date);
                     message.setMessageCount(1);
                     smsInbox.add(message);
 

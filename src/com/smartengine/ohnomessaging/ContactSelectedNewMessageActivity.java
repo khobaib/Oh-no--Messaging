@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -20,14 +22,17 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.ohnomessaging.R;
@@ -39,6 +44,8 @@ import com.smartengine.ohnomessaging.utils.Constants;
 public class ContactSelectedNewMessageActivity extends Activity {
 
     private static int MAX_SMS_MESSAGE_LENGTH = 160;
+    private static final int BUTTON_POSITIVE = -1;
+    private static final int BUTTON_NEGATIVE = -2;
 
     ListView ThreadMessageList;
 
@@ -68,6 +75,18 @@ public class ContactSelectedNewMessageActivity extends Activity {
         setContentView(R.layout.activity_contact_selected_new_message);
 
         ThreadMessageList = (ListView) findViewById(R.id.lv_thread_messages);
+        ThreadMessageList.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                TextMessage selectedMessage = (TextMessage) parent.getItemAtPosition(position);
+                
+                int msgId = selectedMessage.getId();
+                Log.e(">>>>", "deleting msg id = " + msgId);
+                showDeleteDialog(msgId);
+                return false;
+            }
+        });
 
         contactName = null;
         contactId = -1;
@@ -91,8 +110,15 @@ public class ContactSelectedNewMessageActivity extends Activity {
                 if(msgBody == null || msgBody.equals(""))
                     Toast.makeText(ContactSelectedNewMessageActivity.this, "Message is empty.", Toast.LENGTH_SHORT).show();
                 else{
-                    for(String sendTo : phoneNumbers)
+                    for(String sendTo : phoneNumbers){
+                        
+                        ContentValues values = new ContentValues();
+                        values.put("address", sendTo);
+                        values.put("body", msgBody); 
+                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+                        
                         sendSMS(sendTo, msgBody);
+                    }
 //                    finish();
                 }
             }
@@ -111,32 +137,16 @@ public class ContactSelectedNewMessageActivity extends Activity {
         phoneNumbers.add(contactNumber);
         
         myUserPic = getProfilePhoto();
-
-//        String[] mProjection = new String[]{
-//                Profile._ID,
-//                Profile.DISPLAY_NAME_PRIMARY,
-//                Profile.LOOKUP_KEY,
-//                Profile.PHOTO_THUMBNAIL_URI
-//        };
-//
-//        Cursor mProfileCursor = getContentResolver().query(Profile.CONTENT_URI, mProjection , null, null, null);
-//        if (mProfileCursor != null && mProfileCursor.getCount() > 0) {
-//            mProfileCursor.moveToFirst();
-//            byte[] data = mProfileCursor.getBlob(3);
-//            if (data != null) {
-//                myUserPic = BitmapFactory.decodeByteArray(data, 0, data.length);
-//            }
-//        }
-//        mProfileCursor.close();
-
-        
+       
         ivSendTo.setImageBitmap(otherUserPic);
         
-        messageList = fetchInboxSms();
-
-        threadMessageAdapter = new ThreadMessageAdapter(ContactSelectedNewMessageActivity.this,
-                messageList, myUserPic, otherUserPic);
-        ThreadMessageList.setAdapter(threadMessageAdapter);
+        populateMessageList();
+        
+//        messageList = fetchInboxSms();
+//
+//        threadMessageAdapter = new ThreadMessageAdapter(ContactSelectedNewMessageActivity.this,
+//                messageList, myUserPic, otherUserPic);
+//        ThreadMessageList.setAdapter(threadMessageAdapter);
     }
     
     @Override
@@ -149,6 +159,41 @@ public class ContactSelectedNewMessageActivity extends Activity {
     protected void onStop() {
         super.onStop();
         BugSenseHandler.closeSession(this);
+    }
+    
+    
+    private void showDeleteDialog(final int msgId){
+
+
+        AlertDialog Alert = new AlertDialog.Builder(ContactSelectedNewMessageActivity.this).create();                  
+        Alert.setTitle("Delete");
+        Alert.setMessage("Want to delete this text message?"); 
+
+        Alert.setButton(BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+
+                Uri deleteUri = Uri.parse("content://sms");
+                getContentResolver().delete(deleteUri, "_id=" + msgId, null);
+                populateMessageList();
+            }
+        });
+
+        Alert.setButton(BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+            }
+        });            
+        Alert.show();
+    }
+    
+    public void populateMessageList() {
+        
+        messageList = fetchInboxSms();
+
+        threadMessageAdapter = new ThreadMessageAdapter(ContactSelectedNewMessageActivity.this,
+                messageList, myUserPic, otherUserPic);
+        ThreadMessageList.setAdapter(threadMessageAdapter);
     }
 
 
@@ -167,6 +212,7 @@ public class ContactSelectedNewMessageActivity extends Activity {
             c.moveToFirst();
             while (!c.isAfterLast()){
                 //                int threadId = c.getInt(c.getColumnIndexOrThrow("thread_id"));
+                int id = c.getInt(c.getColumnIndexOrThrow("_id"));
                 String contactNumber = c.getString(c.getColumnIndexOrThrow("address"));
                 String messageBody = c.getString(c.getColumnIndexOrThrow("body"));                
                 int msgType = c.getInt(c.getColumnIndexOrThrow("type"));
@@ -177,7 +223,7 @@ public class ContactSelectedNewMessageActivity extends Activity {
 
                 // initially contact-name = number to cover those contact who don't have name
                 // initially contactId = -1;
-                TextMessage message = new TextMessage(contactNumber, contactNumber, contactId, threadId, msgType, messageBody, date);
+                TextMessage message = new TextMessage(contactNumber, contactNumber, contactId, id, threadId, msgType, messageBody, date);
                 smsInbox.add(message);
                 c.moveToNext();
             }
@@ -186,22 +232,6 @@ public class ContactSelectedNewMessageActivity extends Activity {
 
         return smsInbox;
     }
-
-
-//    public void getContactInfo(String contactNumber){
-//        Uri lookupUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(contactNumber));
-//        Cursor nameCursor = getContentResolver().query(lookupUri, new String[]{PhoneLookup.DISPLAY_NAME, PhoneLookup._ID},null,null,null);
-//        try {
-//            nameCursor.moveToFirst();
-//            contactName = nameCursor.getString(nameCursor.getColumnIndexOrThrow(PhoneLookup.DISPLAY_NAME));
-//            contactId = nameCursor.getInt(nameCursor.getColumnIndexOrThrow(PhoneLookup._ID));
-//            //            Log.e(">>>>>", "contact id for " + contactNumber + " is = " + contactId);
-//
-//        } catch (Exception e) {
-//        }finally{
-//            nameCursor.close();
-//        }
-//    }
 
 
     public Bitmap getContactPhoto(long contactId) {
@@ -240,11 +270,8 @@ public class ContactSelectedNewMessageActivity extends Activity {
 
     private void sendSMS(final String phoneNumber, final String message){        
         String SENT = "SMS_SENT";
-//        String DELIVERED = "SMS_DELIVERED";
 
         PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-
-//        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
 
         sentMessageReceiver = new BroadcastReceiver(){
             @Override
@@ -254,10 +281,10 @@ public class ContactSelectedNewMessageActivity extends Activity {
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "SMS sent", Toast.LENGTH_SHORT).show();
                         
-                        ContentValues values = new ContentValues();
-                        values.put("address", phoneNumber);
-                        values.put("body", message); 
-                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+//                        ContentValues values = new ContentValues();
+//                        values.put("address", phoneNumber);
+//                        values.put("body", message); 
+//                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
                         break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                         Toast.makeText(getBaseContext(), "Generic failure", Toast.LENGTH_SHORT).show();
@@ -278,30 +305,22 @@ public class ContactSelectedNewMessageActivity extends Activity {
         };
  
         //---when the SMS has been sent---
-        registerReceiver(sentMessageReceiver, new IntentFilter(SENT));
-
-        //---when the SMS has been delivered---
-//        registerReceiver(new BroadcastReceiver(){
-//            @Override
-//            public void onReceive(Context arg0, Intent arg1) {
-//                switch (getResultCode())
-//                {
-//                    case Activity.RESULT_OK:
-//                        Toast.makeText(getBaseContext(), "SMS delivered to " + phoneNumber, Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case Activity.RESULT_CANCELED:
-//                        Toast.makeText(getBaseContext(), "SMS not delivered to " + phoneNumber, Toast.LENGTH_SHORT).show();
-//                        break;                        
-//                }
-//            }
-//        }, new IntentFilter(DELIVERED));        
+        registerReceiver(sentMessageReceiver, new IntentFilter(SENT));       
 
         SmsManager sms = SmsManager.getDefault();
 
         int length = message.length();          
         if(length > MAX_SMS_MESSAGE_LENGTH) {
-            ArrayList<String> messagelist = sms.divideMessage(message);          
-            sms.sendMultipartTextMessage(phoneNumber, null, messagelist, null, null);
+            ArrayList<String> messagelist = sms.divideMessage(message); 
+            
+            ArrayList<PendingIntent> sendPIs = new ArrayList<PendingIntent>();
+            sendPIs.add(sentPI);
+            int msgCount = messagelist.size();
+            for(int i = 1; i < msgCount; i++){
+                sendPIs.add(null);
+            }
+            
+            sms.sendMultipartTextMessage(phoneNumber, null, messagelist, sendPIs, null);
         }
         else       
             sms.sendTextMessage(phoneNumber, null, message, sentPI, null);        
