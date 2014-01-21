@@ -40,6 +40,7 @@ import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
 import com.smartengine.ohnomessaging.adapter.ThreadMessageAdapter;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
+import com.smartengine.ohnomessaging.view.CustomListView;
 
 public class ContactSelectedNewMessageActivity extends Activity {
 
@@ -47,7 +48,7 @@ public class ContactSelectedNewMessageActivity extends Activity {
     private static final int BUTTON_POSITIVE = -1;
     private static final int BUTTON_NEGATIVE = -2;
 
-    ListView ThreadMessageList;
+    CustomListView ThreadMessageList;
 
     ThreadMessageAdapter threadMessageAdapter;
     List<TextMessage> messageList;
@@ -74,7 +75,7 @@ public class ContactSelectedNewMessageActivity extends Activity {
         
         setContentView(R.layout.activity_contact_selected_new_message);
 
-        ThreadMessageList = (ListView) findViewById(R.id.lv_thread_messages);
+        ThreadMessageList = (CustomListView) findViewById(R.id.lv_thread_messages);
         ThreadMessageList.setOnItemLongClickListener(new OnItemLongClickListener() {
 
             @Override
@@ -217,6 +218,16 @@ public class ContactSelectedNewMessageActivity extends Activity {
                 String messageBody = c.getString(c.getColumnIndexOrThrow("body"));                
                 int msgType = c.getInt(c.getColumnIndexOrThrow("type"));
                 String date = c.getString(c.getColumnIndexOrThrow("date"));
+                
+                int readFlag = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("read")));
+                if(readFlag == 0){
+                    ContentValues cv = new ContentValues();
+                    cv.put("read", "1");
+                    getContentResolver().update(uriSms, cv, "_id = " + id, null);
+                }
+                
+                
+//                Log.e("??????", "read flag = " + c.getString(c.getColumnIndexOrThrow("read")));
 
 //                if(contactId == -1)
 //                    getContactInfo(contactNumber);

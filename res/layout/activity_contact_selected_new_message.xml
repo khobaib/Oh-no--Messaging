@@ -2,10 +2,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ListView
+    <com.smartengine.ohnomessaging.view.CustomListView
         android:id="@+id/lv_thread_messages"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_above="@+id/et_msg_body"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
@@ -13,7 +13,8 @@
         android:divider="@color/android_green"
         android:dividerHeight="1dp"
         android:listSelector="@android:color/transparent"
-        android:stackFromBottom="true" />
+        android:stackFromBottom="true" >
+    </com.smartengine.ohnomessaging.view.CustomListView>
 
     <View
         android:layout_width="fill_parent"

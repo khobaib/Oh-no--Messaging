@@ -41,7 +41,7 @@ public class Utility {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(millis);
         
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm a");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
         dateFormat.setCalendar(cal);
         return dateFormat.format(cal.getTime());
     }

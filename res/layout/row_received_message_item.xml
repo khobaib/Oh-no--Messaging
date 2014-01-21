@@ -11,12 +11,13 @@
 
     <TextView
         android:id="@+id/tv_message_body"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@+id/iv_user_pp"
+        android:background="@drawable/yellow"
         android:text="message"
         android:textColor="@android:color/black"
         android:textSize="18dp" />

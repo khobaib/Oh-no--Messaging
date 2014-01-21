@@ -197,8 +197,8 @@ public class InboxActivity extends Activity {
             c.moveToFirst();
             while (!c.isAfterLast()){
                 int threadId = c.getInt(c.getColumnIndexOrThrow("thread_id"));
-                Log.e(">>>>>>", "msgId = " + c.getInt(c.getColumnIndexOrThrow("_id")) + " AND msgBody = "
-                                    + c.getString(c.getColumnIndexOrThrow("body")));
+//                Log.e(">>>>>>", "msgId = " + c.getInt(c.getColumnIndexOrThrow("_id")) + " AND msgBody = "
+//                                    + c.getString(c.getColumnIndexOrThrow("body")));
                 if(!isThreadIdFound(threadId)){
                     int id = c.getInt(c.getColumnIndexOrThrow("_id"));
                     String contactNumber = c.getString(c.getColumnIndexOrThrow("address"));
