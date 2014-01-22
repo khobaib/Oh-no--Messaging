@@ -68,7 +68,7 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
 
         //        strContacts = null;
         //        phoneNumbers = new ArrayList<String>();
-        defaultUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture);
+        defaultUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture2);
 
         cAdapter = new ContactsAdapter(this);
 

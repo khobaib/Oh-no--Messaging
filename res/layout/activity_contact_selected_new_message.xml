@@ -10,8 +10,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:cacheColorHint="@android:color/transparent"
-        android:divider="@color/android_green"
-        android:dividerHeight="1dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         android:listSelector="@android:color/transparent"
         android:stackFromBottom="true" >
     </com.smartengine.ohnomessaging.view.CustomListView>
@@ -20,7 +20,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/lv_thread_messages"
-        android:background="@color/android_green" />
+        android:background="@color/original_blue" />
 
     <EditText
         android:id="@+id/et_msg_body"
@@ -49,7 +49,8 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_toRightOf="@+id/tv_send_to"
-            android:background="@drawable/ic_contact_picture" />
+            android:scaleType="fitXY"
+            android:background="@drawable/ic_contact_picture2" />
 
         <TextView
             android:id="@+id/tv_send_to"

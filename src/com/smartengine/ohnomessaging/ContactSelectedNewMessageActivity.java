@@ -91,8 +91,8 @@ public class ContactSelectedNewMessageActivity extends Activity {
 
         contactName = null;
         contactId = -1;
-        myUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture);
-        defaultUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture);
+        myUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture2);
+        defaultUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture2);
 
         phoneNumbers = new ArrayList<String>();
         MessageBody = (EditText) findViewById(R.id.et_msg_body);

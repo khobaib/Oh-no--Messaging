@@ -43,7 +43,11 @@ public class Utility {
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
         dateFormat.setCalendar(cal);
-        return dateFormat.format(cal.getTime());
+        
+        String t = dateFormat.format(cal.getTime());
+        if(t.startsWith("0"))
+            t = t.substring(1, t.length());
+        return t;
     }
 
     public static Boolean isToday(long millis) {

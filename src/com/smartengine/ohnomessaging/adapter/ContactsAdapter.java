@@ -42,12 +42,12 @@ public class ContactsAdapter extends CursorAdapter {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_contact_picture_holo_light, options);
+                R.drawable.ic_contact_picture2, options);
         options.inSampleSize = Utility.calculateInSampleSize(options, mDropdownItemHeight,
                 mDropdownItemHeight);
         options.inJustDecodeBounds = false;
         mLoadingImage = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_contact_picture_holo_light, options);
+                R.drawable.ic_contact_picture2, options);
     }
 
     @Override

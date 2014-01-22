@@ -34,7 +34,7 @@ public class MessageListAdapter extends ArrayAdapter<TextMessage> {
         this.messageListArray = messageListArray;
         this.mContext = context;
         this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        defaultUserPic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_contact_picture);
+        defaultUserPic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_contact_picture2);
     }
 
     private static class ViewHolder {

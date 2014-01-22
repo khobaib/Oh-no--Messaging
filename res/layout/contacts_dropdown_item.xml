@@ -28,7 +28,7 @@ limitations under the License.
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_contact_picture_holo_light" />
+        android:src="@drawable/ic_contact_picture2" />
 
     <TextView
         android:id="@+id/text1"

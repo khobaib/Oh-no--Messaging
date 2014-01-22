@@ -24,7 +24,7 @@
         android:layout_height="fill_parent"
         android:layout_below="@+id/b_new_message"
         android:cacheColorHint="@android:color/transparent"
-        android:divider="@color/android_green"
+        android:divider="@color/original_blue"
         android:dividerHeight="1dp"
         android:listSelector="@android:color/transparent" />
 

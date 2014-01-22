@@ -7,7 +7,7 @@
         android:id="@+id/iv_user_pp"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:background="@drawable/ic_contact_picture" />
+        android:scaleType="fitXY" />
 
     <TextView
         android:id="@+id/tv_message_body"
