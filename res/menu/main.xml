@@ -5,5 +5,13 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+   <item
+        android:id="@+id/insert_contact"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/insert_contacts"
+      />
+     
+    
 
 </menu>

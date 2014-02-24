@@ -18,6 +18,8 @@ import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -256,6 +258,21 @@ public class NewMessageActivity extends Activity implements TokenCompleteTextVie
         Log.e("onTokenAdded", "Token removed");
         //        ((TextView)findViewById(R.id.lastEvent)).setText("Removed: " + token);
         updateTokenConfirmation();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	getMenuInflater().inflate(R.menu.main, menu);
+    	return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	
+    	if(item.getItemId()==R.id.insert_contact)
+    	{
+    		
+    	}
+    	
+    	return super.onOptionsItemSelected(item);
     }
 
 }
