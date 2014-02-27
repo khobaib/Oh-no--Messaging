@@ -44,6 +44,7 @@ public class InboxActivity extends Activity {
 
 	private static final int BUTTON_POSITIVE = -1;
 	private static final int BUTTON_NEGATIVE = -2;
+	private static int init=0;
 
 	// private static final int TYPE_INCOMING_MESSAGE = 1;
 	private ListView messageList;
@@ -96,6 +97,7 @@ public class InboxActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
+
 				TextMessage selectedMessage = (TextMessage) parent
 						.getItemAtPosition(position);
 				SharedPreferences prefs = PreferenceManager
@@ -125,14 +127,98 @@ public class InboxActivity extends Activity {
 
 		messageList.setOnItemLongClickListener(new OnItemLongClickListener() {
 
+			
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View v,
 					int position, long id) {
+				SharedPreferences.Editor editor = PreferenceManager
+						.getDefaultSharedPreferences(
+								InboxActivity.this).edit();
+				editor.putString("init","0");
+				editor.commit();
+				final ArrayList<String> list = new ArrayList<String>();
 				TextMessage selectedMessage = (TextMessage) parent
 						.getItemAtPosition(position);
+				final int threadId = selectedMessage.getThreadId();
+				Spinner spinner = (Spinner) parent
+						.findViewById(R.id.spinnerlongoptn);
 
-				int threadId = selectedMessage.getThreadId();
-				showLongPressOptionsDialog(threadId);
+				SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(InboxActivity.this);
+				String password = prefs.getString("password", "");
+				if (!password.equals("")) {
+
+					String isLocked = prefs.getString("thread_" + threadId,
+							"-1");
+					//list.add("options");
+					if (isLocked.equals("locked")) {
+						list.add("UNLOCK");
+					} else
+						list.add("LOCK");
+					list.add("DELETE");
+
+					spinner.performClick();
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+							getApplicationContext(), R.layout.spinner_row_view,
+							list);
+					spinner.setAdapter(adapter);
+				
+					spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+						
+
+						@Override
+						public void onItemSelected(AdapterView<?> parent,
+								View v, int position, long id) {
+							SharedPreferences prefs = PreferenceManager
+									.getDefaultSharedPreferences(InboxActivity.this);
+							String init = prefs.getString(
+									"init","-1");
+							Log.v("msg",init);
+							
+							if (position ==0 && init.equals("1")) {
+								if (list.get(position).equals("LOCK")) {
+									SharedPreferences.Editor editor = PreferenceManager
+											.getDefaultSharedPreferences(
+													InboxActivity.this).edit();
+									editor.putString("thread_" + threadId,
+											"locked");
+									editor.commit();
+									toast("Thread is Locked");
+								} else if (list.get(position).equals("UNLOCK")) {
+									/*
+									 * SharedPreferences.Editor editor =
+									 * PreferenceManager
+									 * .getDefaultSharedPreferences
+									 * (InboxActivity.this) .edit();
+									 * editor.putString("thread_" + tid,
+									 * "unlocked"); editor.commit();
+									 */
+									showUnlockDialog(threadId);
+								}
+							} else if (position == 1)
+								showDeleteDialog(threadId);
+							
+							
+							SharedPreferences.Editor editor = PreferenceManager
+									.getDefaultSharedPreferences(
+											InboxActivity.this).edit();
+							editor.putString("init","1");
+							editor.commit();	
+							
+
+						}
+
+						@Override
+						public void onNothingSelected(AdapterView<?> arg0) {
+							
+
+						}
+					}); 
+				}
+				else
+					toast("No Password is Set");
+
+				// showLongPressOptionsDialog(threadId);
 				// showDeleteDialog(threadId);
 				return false;
 			}
@@ -194,16 +280,15 @@ public class InboxActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-
+			
 			}
 		});
 		lngpressoptionsdialog.show();
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-		lngpressoptionsdialog.getWindow().setLayout(metrics.heightPixels,
-				metrics.widthPixels);
+		// lngpressoptionsdialog.getWindow().setLayout(metrics.heightPixels,
+		// metrics.widthPixels);
 	}
 
 	private void showUnlockDialog(int threadId) {
@@ -241,10 +326,11 @@ public class InboxActivity extends Activity {
 			}
 		});
 		dialog.show();
-		DisplayMetrics metrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		// DisplayMetrics metrics = new DisplayMetrics();
+		// getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-		dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);
+		// dialog.getWindow().setLayout(metrics.heightPixels,
+		// metrics.widthPixels);
 
 	}
 
@@ -466,4 +552,5 @@ public class InboxActivity extends Activity {
 		startActivity(i);
 	}
 
+	
 }

@@ -142,7 +142,7 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-		dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);
+		//dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);
 	}
 
 	private void toast(String str) {

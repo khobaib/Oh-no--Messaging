@@ -62,4 +62,12 @@
         android:textColor="@android:color/black"
         android:textSize="15dp" />
 
+    <Spinner
+        android:id="@+id/spinnerlongoptn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignRight="@+id/tv_contact_name"
+        android:layout_below="@+id/iv_user_pp" 
+        android:spinnerMode="dialog"/>
+
 </RelativeLayout>
