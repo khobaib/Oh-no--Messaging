@@ -1,35 +1,40 @@
 package com.smartengine.ohnomessaging;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.SmsManager;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.ohnomessaging.R;
+import com.smartengine.ohnomessaging.adapter.ContactListadapter;
 import com.smartengine.ohnomessaging.adapter.ContactsAdapter;
 import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.utils.Constants;
@@ -37,242 +42,308 @@ import com.smartengine.ohnomessaging.utils.Utility;
 import com.smartengine.ohnomessaging.view.ContactsCompletionView;
 import com.smartengine.ohnomessaging.view.TokenCompleteTextView;
 
-public class NewMessageActivity extends Activity implements TokenCompleteTextView.TokenListener{
+public class NewMessageActivity extends Activity implements
+		TokenCompleteTextView.TokenListener {
 
-    private static int MAX_SMS_MESSAGE_LENGTH = 160;
+	private static int MAX_SMS_MESSAGE_LENGTH = 160;
 
-    RelativeLayout rlSendTo;
-    TextView tvSendTo;
-    ImageView ivSendTo;
+	RelativeLayout rlSendTo;
+	TextView tvSendTo;
+	ImageView ivSendTo;
 
-    //    ContactsEditText contactNos;
+	// ContactsEditText contactNos;
 
-    ContactsCompletionView completionView;
-    ContactsAdapter cAdapter;
-    EditText MessageBody;
+	ContactsCompletionView completionView;
+	ContactsAdapter cAdapter;
+	EditText MessageBody;
 
-    //    String strContacts;
-    //    List<String> phoneNumbers;
+	// String strContacts;
+	// List<String> phoneNumbers;
 
-    Bitmap defaultUserPic;
+	Bitmap defaultUserPic;
 
-    int fromActivity;
+	int fromActivity;
 
-    BroadcastReceiver sentMessageReceiver;
+	BroadcastReceiver sentMessageReceiver;
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		BugSenseHandler.initAndStartSession(this, Constants.BUGSENSE_API_KEY);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        BugSenseHandler.initAndStartSession(this, Constants.BUGSENSE_API_KEY);
+		setContentView(R.layout.activity_new_message);
 
-        setContentView(R.layout.activity_new_message);
+		// strContacts = null;
+		// phoneNumbers = new ArrayList<String>();
+		defaultUserPic = BitmapFactory.decodeResource(getResources(),
+				R.drawable.ic_contact_picture2);
 
-        //        strContacts = null;
-        //        phoneNumbers = new ArrayList<String>();
-        defaultUserPic = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture2);
+		cAdapter = new ContactsAdapter(this);
 
-        cAdapter = new ContactsAdapter(this);
+		completionView = (ContactsCompletionView) findViewById(R.id.searchView);
+		completionView.setAdapter(cAdapter);
+		completionView.setTokenListener(this);
 
-        completionView = (ContactsCompletionView)findViewById(R.id.searchView);
-        completionView.setAdapter(cAdapter);
-        completionView.setTokenListener(this);
+		if (savedInstanceState == null) {
+			completionView.setPrefix("");
+			// completionView.addObject(people[0]);
+			// completionView.addObject(people[1]);
+		}
 
-        if (savedInstanceState == null) {
-            completionView.setPrefix("");
-            //            completionView.addObject(people[0]);
-            //            completionView.addObject(people[1]);
-        }
+		// contactNos = (ContactsEditText) findViewById(R.id.act_to);
+		MessageBody = (EditText) findViewById(R.id.et_msg_body);
 
-        //        contactNos = (ContactsEditText) findViewById(R.id.act_to);
-        MessageBody = (EditText) findViewById(R.id.et_msg_body);
+		tvSendTo = (TextView) findViewById(R.id.tv_send_to);
+		ivSendTo = (ImageView) findViewById(R.id.iv_send_to);
 
-        tvSendTo = (TextView) findViewById(R.id.tv_send_to);         
-        ivSendTo = (ImageView) findViewById(R.id.iv_send_to);  
+		rlSendTo = (RelativeLayout) findViewById(R.id.rl_send_to);
+		rlSendTo.setOnClickListener(new OnClickListener() {
 
-        rlSendTo = (RelativeLayout) findViewById(R.id.rl_send_to);
-        rlSendTo.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// String sendTo = contactNos.getText().toString().trim();
+				String msgBody = MessageBody.getText().toString().trim();
 
-            @Override
-            public void onClick(View v) {   
-                //                String sendTo = contactNos.getText().toString().trim();
-                String msgBody = MessageBody.getText().toString().trim();
+				if (completionView.getObjects().size() == 0)
+					Toast.makeText(NewMessageActivity.this,
+							"No contact is selected.", Toast.LENGTH_SHORT)
+							.show();
+				else if (msgBody == null || msgBody.equals(""))
+					Toast.makeText(NewMessageActivity.this,
+							"Message is empty.", Toast.LENGTH_SHORT).show();
+				else {
+					for (Object obj : completionView.getObjects()) {
+						Contact contact = (Contact) obj;
+						String sendTo = contact.getPhoneNumber();
 
-                if(completionView.getObjects().size() == 0)
-                    Toast.makeText(NewMessageActivity.this, "No contact is selected.", Toast.LENGTH_SHORT).show();
-                else if(msgBody == null || msgBody.equals(""))
-                    Toast.makeText(NewMessageActivity.this, "Message is empty.", Toast.LENGTH_SHORT).show();
-                else{
-                    for (Object obj: completionView.getObjects()) {
-                        Contact contact = (Contact)obj;
-                        String sendTo = contact.getPhoneNumber();
-                        
-                        ContentValues values = new ContentValues();
-                        values.put("address", sendTo);
-                        values.put("body", msgBody); 
-                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
-                        
-                        sendSMS(sendTo, msgBody);
-                    }
-                }
-            }
-        }); 
-    }
+						ContentValues values = new ContentValues();
+						values.put("address", sendTo);
+						values.put("body", msgBody);
+						getApplicationContext().getContentResolver().insert(
+								Uri.parse("content://sms/sent"), values);
 
+						sendSMS(sendTo, msgBody);
+					}
+				}
+			}
+		});
+	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		BugSenseHandler.startSession(this);
+	}
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        BugSenseHandler.startSession(this);
-    }
+	@Override
+	protected void onStop() {
+		super.onStop();
+		BugSenseHandler.closeSession(this);
+	}
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        BugSenseHandler.closeSession(this);
-    }
+	private void sendSMS(final String phoneNumber, final String message) {
+		String SENT = "SMS_SENT";
+		// String DELIVERED = "SMS_DELIVERED";
 
+		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(
+				SENT), 0);
 
-    private void sendSMS(final String phoneNumber, final String message){        
-        String SENT = "SMS_SENT";
-        //        String DELIVERED = "SMS_DELIVERED";
+		// PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new
+		// Intent(DELIVERED), 0);
 
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+		sentMessageReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent arg1) {
+				switch (getResultCode()) {
+				case Activity.RESULT_OK:
+					Toast.makeText(getBaseContext(), "SMS sent",
+							Toast.LENGTH_SHORT).show();
 
-        //        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+					// ContentValues values = new ContentValues();
+					// values.put("address", phoneNumber);
+					// values.put("body", message);
+					// getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"),
+					// values);
 
-        sentMessageReceiver = new BroadcastReceiver(){
-            @Override
-            public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(getBaseContext(), "SMS sent", Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+					Toast.makeText(getBaseContext(), "Generic failure",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_NO_SERVICE:
+					Toast.makeText(getBaseContext(), "No service",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_NULL_PDU:
+					Toast.makeText(getBaseContext(), "Null PDU",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_RADIO_OFF:
+					Toast.makeText(getBaseContext(), "Radio off",
+							Toast.LENGTH_SHORT).show();
+					break;
+				}
 
-//                        ContentValues values = new ContentValues();
-//                        values.put("address", phoneNumber);
-//                        values.put("body", message); 
-//                        getApplicationContext().getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+				try {
+					unregisterReceiver(sentMessageReceiver);
+					NewMessageActivity.this.finish();
+				} catch (Exception e) {
+					Log.e("", "exception in unregistering broadcastreceiver");
+				}
+			}
+		};
 
-                        break;
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Toast.makeText(getBaseContext(), "Generic failure", Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        Toast.makeText(getBaseContext(), "No service", Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Toast.makeText(getBaseContext(), "Null PDU", Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(getBaseContext(), "Radio off", Toast.LENGTH_SHORT).show();
-                        break;
-                }
+		// ---when the SMS has been sent---
+		registerReceiver(sentMessageReceiver, new IntentFilter(SENT));
 
-                try{
-                    unregisterReceiver(sentMessageReceiver);
-                    NewMessageActivity.this.finish();
-                }catch (Exception e){
-                    Log.e("", "exception in unregistering broadcastreceiver");
-                }
-            }
-        };
+		SmsManager sms = SmsManager.getDefault();
 
-        //---when the SMS has been sent---
-        registerReceiver(sentMessageReceiver, new IntentFilter(SENT));      
+		int length = message.length();
+		if (length > MAX_SMS_MESSAGE_LENGTH) {
+			ArrayList<String> messagelist = sms.divideMessage(message);
 
-        SmsManager sms = SmsManager.getDefault();
+			ArrayList<PendingIntent> sendPIs = new ArrayList<PendingIntent>();
+			sendPIs.add(sentPI);
+			int msgCount = messagelist.size();
+			for (int i = 1; i < msgCount; i++) {
+				sendPIs.add(null);
+			}
 
-        int length = message.length();          
-        if(length > MAX_SMS_MESSAGE_LENGTH) {
-            ArrayList<String> messagelist = sms.divideMessage(message);         
-            
-            ArrayList<PendingIntent> sendPIs = new ArrayList<PendingIntent>();
-            sendPIs.add(sentPI);
-            int msgCount = messagelist.size();
-            for(int i = 1; i < msgCount; i++){
-                sendPIs.add(null);
-            }
-            
-            sms.sendMultipartTextMessage(phoneNumber, null, messagelist, sendPIs, null);
-        }
-        else       
-            sms.sendTextMessage(phoneNumber, null, message, sentPI, null);        
-    }
+			sms.sendMultipartTextMessage(phoneNumber, null, messagelist,
+					sendPIs, null);
+		} else
+			sms.sendTextMessage(phoneNumber, null, message, sentPI, null);
+	}
 
-    public void onClickInbox(View v){
-        Intent i = new Intent(NewMessageActivity.this, InboxActivity.class);
-        startActivity(i);
-        finish();
-    }
+	public void onClickInbox(View v) {
+		Intent i = new Intent(NewMessageActivity.this, InboxActivity.class);
+		startActivity(i);
+		finish();
+	}
 
+	private void updateUI() {
+		String strContacts = null;
+		if (completionView.getObjects().size() == 0) {
+			strContacts = "Send";
+			ivSendTo.setImageBitmap(defaultUserPic);
+			tvSendTo.setVisibility(View.INVISIBLE);
+		} else if (completionView.getObjects().size() == 1) {
+			strContacts = ""
+					+ ((Contact) completionView.getObjects().get(0))
+							.getDisplayName();
+			ivSendTo.setVisibility(View.VISIBLE);
+			ivSendTo.setImageBitmap(((Contact) completionView.getObjects().get(
+					0)).getImage());
+			tvSendTo.setVisibility(View.VISIBLE);
+		} else if (completionView.getObjects().size() > 1) {
+			ivSendTo.setVisibility(View.GONE);
+			strContacts = "";
+			for (Object obj : completionView.getObjects()) {
+				Contact contact = (Contact) obj;
+				strContacts = strContacts + contact.getDisplayName() + ", ";
+			}
+			strContacts = Utility.trimLastComma(strContacts);
+			tvSendTo.setVisibility(View.VISIBLE);
+		}
 
+		tvSendTo.setText(strContacts);
+	}
 
+	private void updateTokenConfirmation() {
+		updateUI();
+	}
 
-    private void updateUI(){
-        String strContacts = null;
-        if(completionView.getObjects().size() == 0){
-            strContacts = "Send";  
-            ivSendTo.setImageBitmap(defaultUserPic);
-            tvSendTo.setVisibility(View.INVISIBLE);
-        }
-        else if(completionView.getObjects().size() == 1){
-            strContacts = "" + ((Contact) completionView.getObjects().get(0)).getDisplayName();
-            ivSendTo.setVisibility(View.VISIBLE);
-            ivSendTo.setImageBitmap(((Contact) completionView.getObjects().get(0)).getImage());
-            tvSendTo.setVisibility(View.VISIBLE);
-        }
-        else if(completionView.getObjects().size() > 1){
-            ivSendTo.setVisibility(View.GONE);
-            strContacts = ""; 
-            for (Object obj: completionView.getObjects()) {
-                Contact contact = (Contact)obj;
-                strContacts = strContacts + contact.getDisplayName() + ", ";
-            }
-            strContacts = Utility.trimLastComma(strContacts);
-            tvSendTo.setVisibility(View.VISIBLE);
-        }
+	@Override
+	public void onTokenAdded(Object token) {
+		// ((TextView)findViewById(R.id.lastEvent)).setText("Added: " + token);
+		Log.e("onTokenAdded", "Token Added");
+		updateTokenConfirmation();
+	}
 
+	public void showDialog() {
+		final Dialog dialog = new Dialog(NewMessageActivity.this);
+		dialog.setContentView(R.layout.list_view_contact);
+		dialog.setTitle("Pic Number");
+		ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
+		final ArrayList<Contact> contactList = getContacts();
+		Log.v("msg",""+contactList.size());
+		 ContactListadapter adapter = new ContactListadapter(
+				getApplicationContext(), R.layout.list_view_contact_row,
+				contactList);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
 
-        tvSendTo.setText(strContacts);
-    }
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				String text=MessageBody.getText().toString();
+				text=text+"\n"+"Name: "+contactList.get(position).getDisplayName()+"\n phone Number:"+contactList.get(position).getPhoneNumber();
+				MessageBody.setText(text);
+				dialog.dismiss();
+				
+			}
+			
+		});
+		dialog.show();
+		DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+		dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);
+	}
 
+	public ArrayList<Contact> getContacts() {
 
+		ArrayList<Contact> contactList = new ArrayList<Contact>();
+		Cursor phones = getContentResolver().query(
+				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+				null, null);
+		while (phones.moveToNext()) {
+			Contact contact = new Contact();
+			String name = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			String phoneNumber = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+			// Log.v("msg",name+phoneNumber);
+			contact.setDisplayName(name);
+			contact.setPhoneNumber(phoneNumber);
+			contactList.add(contact);
 
-    private void updateTokenConfirmation() {
-        updateUI();
-    }
+		}
+		phones.close();
 
+		return contactList;
+	}
 
-    @Override
-    public void onTokenAdded(Object token) {
-        //        ((TextView)findViewById(R.id.lastEvent)).setText("Added: " + token);
-        Log.e("onTokenAdded", "Token Added");
-        updateTokenConfirmation();
-    }
+	@Override
+	public void onTokenRemoved(Object token) {
+		Log.e("onTokenAdded", "Token removed");
+		// ((TextView)findViewById(R.id.lastEvent)).setText("Removed: " +
+		// token);
+		updateTokenConfirmation();
+	}
 
-    @Override
-    public void onTokenRemoved(Object token) {
-        Log.e("onTokenAdded", "Token removed");
-        //        ((TextView)findViewById(R.id.lastEvent)).setText("Removed: " + token);
-        updateTokenConfirmation();
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	getMenuInflater().inflate(R.menu.main, menu);
-    	return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	
-    	if(item.getItemId()==R.id.insert_contact)
-    	{
-    		
-    	}
-    	
-    	return super.onOptionsItemSelected(item);
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (item.getItemId() == R.id.insert_contact) {
+			showDialog();
+
+		}
+		else if (item.getItemId()==R.id.action_settings)
+		{
+			Intent intent=new Intent(getApplicationContext(),SettingsActivity.class);
+			startActivity(intent);
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
 
 }
