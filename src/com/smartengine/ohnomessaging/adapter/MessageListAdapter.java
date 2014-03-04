@@ -93,6 +93,7 @@ public class MessageListAdapter extends ArrayAdapter<TextMessage> {
         this.messageListArray = messageList;
         notifyDataSetChanged();
     }
+    
 
 
     public void getContactInfo(int position){

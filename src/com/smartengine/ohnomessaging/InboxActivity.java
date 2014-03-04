@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,6 +38,7 @@ import com.bugsense.trace.BugSenseHandler;
 
 import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
+import com.smartengine.ohnomessaging.adapter.NothingSelectedSpinnerAdapter;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
 
@@ -44,7 +46,7 @@ public class InboxActivity extends Activity {
 
 	private static final int BUTTON_POSITIVE = -1;
 	private static final int BUTTON_NEGATIVE = -2;
-	private static int init=0;
+	private static int init = 0;
 
 	// private static final int TYPE_INCOMING_MESSAGE = 1;
 	private ListView messageList;
@@ -127,15 +129,10 @@ public class InboxActivity extends Activity {
 
 		messageList.setOnItemLongClickListener(new OnItemLongClickListener() {
 
-			
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View v,
 					int position, long id) {
-				SharedPreferences.Editor editor = PreferenceManager
-						.getDefaultSharedPreferences(
-								InboxActivity.this).edit();
-				editor.putString("init","0");
-				editor.commit();
+
 				final ArrayList<String> list = new ArrayList<String>();
 				TextMessage selectedMessage = (TextMessage) parent
 						.getItemAtPosition(position);
@@ -143,88 +140,91 @@ public class InboxActivity extends Activity {
 				Spinner spinner = (Spinner) parent
 						.findViewById(R.id.spinnerlongoptn);
 
-				SharedPreferences prefs = PreferenceManager
-						.getDefaultSharedPreferences(InboxActivity.this);
-				String password = prefs.getString("password", "");
-				if (!password.equals("")) {
+				//list.add("Options");
+				String option = setLockUnLockOption(threadId);
+				list.add(option);
+				list.add("DELETE");
+														
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+						getApplicationContext(), R.layout.spinner_row_view,
+						list);
+				spinner.setAdapter(new NothingSelectedSpinnerAdapter(adapter,R.layout.spinner_row_view,InboxActivity.this));
+				//spinner.setAdapter(adapter);
+				spinner.performClick();
+				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
-					String isLocked = prefs.getString("thread_" + threadId,
-							"-1");
-					//list.add("options");
-					if (isLocked.equals("locked")) {
-						list.add("UNLOCK");
-					} else
-						list.add("LOCK");
-					list.add("DELETE");
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View v,
+							int position, long id) {
 
-					spinner.performClick();
-					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-							getApplicationContext(), R.layout.spinner_row_view,
-							list);
-					spinner.setAdapter(adapter);
-				
-					spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+						if (position == 1) {
+							if (list.get(position-1).equals("LOCK")) {
+								setLockToThread(threadId);
+
+							} else if (list.get(position-1).equals("UNLOCK")) {
+
+								showUnlockDialog(threadId);
+							}
+						} else if (position == 2)
+							showDeleteDialog(threadId);
+						
 						
 
-						@Override
-						public void onItemSelected(AdapterView<?> parent,
-								View v, int position, long id) {
-							SharedPreferences prefs = PreferenceManager
-									.getDefaultSharedPreferences(InboxActivity.this);
-							String init = prefs.getString(
-									"init","-1");
-							Log.v("msg",init);
-							
-							if (position ==0 && init.equals("1")) {
-								if (list.get(position).equals("LOCK")) {
-									SharedPreferences.Editor editor = PreferenceManager
-											.getDefaultSharedPreferences(
-													InboxActivity.this).edit();
-									editor.putString("thread_" + threadId,
-											"locked");
-									editor.commit();
-									toast("Thread is Locked");
-								} else if (list.get(position).equals("UNLOCK")) {
-									/*
-									 * SharedPreferences.Editor editor =
-									 * PreferenceManager
-									 * .getDefaultSharedPreferences
-									 * (InboxActivity.this) .edit();
-									 * editor.putString("thread_" + tid,
-									 * "unlocked"); editor.commit();
-									 */
-									showUnlockDialog(threadId);
-								}
-							} else if (position == 1)
-								showDeleteDialog(threadId);
-							
-							
-							SharedPreferences.Editor editor = PreferenceManager
-									.getDefaultSharedPreferences(
-											InboxActivity.this).edit();
-							editor.putString("init","1");
-							editor.commit();	
-							
+					}
 
-						}
+					@Override
+					public void onNothingSelected(AdapterView<?> arg0) {
 
-						@Override
-						public void onNothingSelected(AdapterView<?> arg0) {
-							
+					}
+				});
 
-						}
-					}); 
-				}
-				else
-					toast("No Password is Set");
-
-				// showLongPressOptionsDialog(threadId);
-				// showDeleteDialog(threadId);
 				return false;
 			}
 		});
 
 		populateMessageList();
+	}
+
+	public String setLockUnLockOption(int thrdid) {
+		if (isThreadLocked(thrdid))
+			return "UNLOCK";
+		else
+			return "LOCK";
+
+	}
+
+	public boolean isPasswordSet() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(InboxActivity.this);
+		String password = prefs.getString("password", "");
+		Log.v("pass",password);
+		if (password.equals(""))
+			return false;
+		else
+			return true;
+
+	}
+
+	public boolean isThreadLocked(int thrdid) {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(InboxActivity.this);
+		String isLocked = prefs.getString("thread_" + thrdid, "-1");
+		if (isLocked.equals("locked"))
+			return true;
+		else
+			return false;
+
+	}
+
+	public void setLockToThread(int thrdid) {
+		if (isPasswordSet()) {
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(InboxActivity.this).edit();
+			editor.putString("thread_" + thrdid, "locked");
+			editor.commit();
+			toast("Thread is Locked");
+		} else
+			toast("No password is set.Please set a password.");
 	}
 
 	private void showLongPressOptionsDialog(int threadId) {
@@ -280,7 +280,7 @@ public class InboxActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-			
+
 			}
 		});
 		lngpressoptionsdialog.show();
@@ -552,5 +552,4 @@ public class InboxActivity extends Activity {
 		startActivity(i);
 	}
 
-	
 }
