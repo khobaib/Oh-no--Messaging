@@ -1,7 +1,5 @@
 package com.smartengine.ohnomessaging.utils;
 
-
-
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -33,12 +31,12 @@ public class SMSPopUpUtility {
 	String contactName;
 	String contactId;
 	String contactLookupKey;
- public static final int READ_THREAD = 1;
+	public static final int READ_THREAD = 1;
 
 	public static void deleteMessage(Context context, long messageId,
 			long threadId, int messageType) {
 		Uri deleteUri = null;
-		Log.v("msg","ind elete"+threadId+" "+messageId);
+		Log.v("msg", "ind elete" + threadId + " " + messageId);
 		if (messageId > 0) {
 
 			// We need to mark this message read first to ensure the entire
@@ -65,7 +63,7 @@ public class SMSPopUpUtility {
 			// unread messages
 			// setThreadRead(context, threadId);
 		}
-		Log.v("msg","in delete");
+		Log.v("msg", "in delete");
 	}
 
 	public static class ContactIdentification {
@@ -81,7 +79,7 @@ public class SMSPopUpUtility {
 		}
 	}
 
-	public  void SmsMmsMessage(Context _context, SmsMessage[] messages,
+	public void SmsMmsMessage(Context _context, SmsMessage[] messages,
 			long _timestamp) {
 		SmsMessage sms = messages[0];
 
@@ -136,18 +134,16 @@ public class SMSPopUpUtility {
 			contactId = contactIdentify.contactId;
 			contactLookupKey = contactIdentify.contactLookup;
 			contactName = contactIdentify.contactName;
-			Log.v("msg",contactId+contactLookupKey+contactName);
+			Log.v("msg", contactId + contactLookupKey + contactName);
 		}
-		
 
 		// unreadCount = SmsPopupUtils.getUnreadMessagesCount(context,
 		// timestamp, messageBody);
 	}
-	public String getBody(Context contxt, SmsMessage[] messages)
-	{
+
+	public String getBody(Context contxt, SmsMessage[] messages) {
 		SmsMessage sms = messages[0];
 
-		
 		// messageType = MESSAGE_TYPE_SMS;
 
 		/*
@@ -175,14 +171,14 @@ public class SMSPopUpUtility {
 		messageBody = body;
 		Log.v("body", body);
 		return body;
-		
+
 	}
-	public String getAddress(Context _context, SmsMessage[] messages)
-	{
+
+	public String getAddress(Context _context, SmsMessage[] messages) {
 		SmsMessage sms = messages[0];
 
 		context = _context;
-		//timestamp = _timestamp;
+		// timestamp = _timestamp;
 		// messageType = MESSAGE_TYPE_SMS;
 
 		/*
@@ -233,8 +229,7 @@ public class SMSPopUpUtility {
 		return null;
 	}
 
-	synchronized public static long findThreadIdFromAddress(Context context,
-			String address) {
+	public long findThreadIdFromAddress(Context context, String address) {
 		if (address == null)
 			return 0;
 
@@ -265,72 +260,70 @@ public class SMSPopUpUtility {
 	synchronized public static long findMessageId(Context context,
 			long threadId, long timestamp, String body, int messageType) {
 
-		Log.v("msg","body"+body);
-		  long id = 0;
-	        String selection = "body = " + DatabaseUtils.sqlEscapeString(body != null ? body : "");
-	        selection += " and " + UNREAD_CONDITION;
-	        final String sortOrder = "date DESC";
-	        final String[] projection = new String[] { "_id", "date", "thread_id", "body" };
+		Log.v("msg", "body" + body);
+		long id = 0;
+		String selection = "body = "
+				+ DatabaseUtils.sqlEscapeString(body != null ? body : "");
+		selection += " and " + UNREAD_CONDITION;
+		final String sortOrder = "date DESC";
+		final String[] projection = new String[] { "_id", "date", "thread_id",
+				"body" };
 
-	        if (threadId > 0) {
-	            Cursor cursor = context.getContentResolver().query(
-	                    ContentUris.withAppendedId(CONVERSATION_CONTENT_URI, threadId),
-	                    projection,
-	                    selection,
-	                    null,
-	                    sortOrder);
+		if (threadId > 0) {
+			Cursor cursor = context.getContentResolver().query(
+					ContentUris.withAppendedId(CONVERSATION_CONTENT_URI,
+							threadId), projection, selection, null, sortOrder);
 
-	            try {
-	                if (cursor != null && cursor.moveToFirst()) {
-	                    id = cursor.getLong(0);}
-	                else
-	                	Log.v("msg","null");
-	                    
-	            } finally {
-	                cursor.close();
-	            }
-	        }
-	        Log.v("msg","thread id "+threadId+"  "+ id);
+			try {
+				if (cursor != null && cursor.moveToFirst()) {
+					id = cursor.getLong(0);
+				} else
+					Log.v("msg", "null");
 
-	
+			} finally {
+				cursor.close();
+			}
+		}
+		Log.v("msg", "thread id " + threadId + "  " + id);
 
-	        return id;
+		return id;
 	}
-	 synchronized public static void setMessageRead(
-	            Context context, long messageId, int messageType) {
 
-	        SharedPreferences myPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-	       /* boolean markRead = myPrefs.getBoolean(
-	                context.getString(R.string.pref_markread_key),
-	                Defaults.PREFS_MARK_READ);
-	        if (!markRead) {
-	            return;
-	        }*/
+	public static void setMessageRead(Context context, long messageId, int messageType) {
 
-	        if (messageId > 0) {
-	            ContentValues values = new ContentValues(1);
-	            values.put("read", READ_THREAD);
+		SharedPreferences myPrefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		/*
+		 * boolean markRead = myPrefs.getBoolean(
+		 * context.getString(R.string.pref_markread_key),
+		 * Defaults.PREFS_MARK_READ); if (!markRead) { return; }
+		 */
 
-	            Uri messageUri;
+		if (messageId > 0) {
+			ContentValues values = new ContentValues(1);
+			values.put("read", READ_THREAD);
 
-	           
-	            if (SMSPopUpUtility.MESSAGE_TYPE_SMS == messageType) {
-	                messageUri = Uri.withAppendedPath(SMS_CONTENT_URI, String.valueOf(messageId));
-	            } else {
-	                return;
-	            }
+			Uri messageUri;
 
-	            // Log.v("messageUri for marking message read: " + messageUri.toString());
+			if (SMSPopUpUtility.MESSAGE_TYPE_SMS == messageType) {
+				messageUri = Uri.withAppendedPath(SMS_CONTENT_URI,
+						String.valueOf(messageId));
+			} else {
+				return;
+			}
 
-	            ContentResolver cr = context.getContentResolver();
-	            int result;
-	            try {
-	                result = cr.update(messageUri, values, null, null);
-	            } catch (Exception e) {
-	                result = 0;
-	            }
-	           
-	        }
-	    }
+			// Log.v("messageUri for marking message read: " +
+			// messageUri.toString());
+
+			ContentResolver cr = context.getContentResolver();
+			int result;
+			try {
+				result = cr.update(messageUri, values, null, null);
+			} catch (Exception e) {
+				result = 0;
+			}
+
+		}
+	}
 
 }
