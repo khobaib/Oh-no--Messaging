@@ -348,6 +348,12 @@ public class NewMessageActivity extends Activity implements
 			startActivity(intent);
 			
 		}
+		else if(item.getItemId()==R.id.preset_messages)
+		{
+			Intent intent=new Intent(getApplicationContext(),PresetMessagesActivity.class);
+			startActivity(intent);
+			
+		}
 
 		return super.onOptionsItemSelected(item);
 	}

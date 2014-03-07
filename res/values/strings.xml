@@ -4,7 +4,8 @@
     <string name="app_name">Oh NO!</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-     <string name="insert_contacts">Insert Contacts</string>
-     <string name="saved_messages">Save Messages</string>
+    <string name="insert_contacts">Insert Contacts</string>
+    <string name="saved_messages">Save Messages</string>
+    <string name="preset_messages">Preset Messages</string>
 
 </resources>

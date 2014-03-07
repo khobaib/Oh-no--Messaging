@@ -3,8 +3,10 @@ package com.smartengine.ohnomessaging;
 import java.util.ArrayList;
 
 import com.ohnomessaging.R;
+import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -17,15 +19,19 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class QuickReplyActivity extends Activity implements OnClickListener{
 	private TextView txtsendto;
 	private EditText edtmsg;
-	private Button btnsend;
+	private Button btnsend,btnPreset;
 	String number="";
 	BroadcastReceiver sentMessageReceiver;
 	private static int MAX_SMS_MESSAGE_LENGTH = 160;
@@ -36,6 +42,8 @@ public class QuickReplyActivity extends Activity implements OnClickListener{
 		txtsendto=(TextView)findViewById(R.id.textViewsendto);
 		edtmsg=(EditText)findViewById(R.id.editTextmsg);
 		btnsend=(Button)findViewById(R.id.buttonsend);
+		btnPreset=(Button)findViewById(R.id.buttonPreset);
+		btnPreset.setOnClickListener(this);
 		btnsend.setOnClickListener(this);
 		
 		Intent intent=getIntent();
@@ -61,6 +69,34 @@ public class QuickReplyActivity extends Activity implements OnClickListener{
 			}
 				
 		}
+		if(v.getId()==R.id.buttonPreset)
+		{
+			showPresetDialog();
+			
+		}
+	}
+	public void showPresetDialog()
+	{
+		final Dialog dialog = new Dialog(QuickReplyActivity.this);
+		dialog.setContentView(R.layout.dialog_choose_preset);
+		dialog.setTitle("Choose Message");
+		ListView listmsg=(ListView)dialog.findViewById(R.id.listViewsavedMessages);
+		SavedMessageDatabase smdatabase=new SavedMessageDatabase(QuickReplyActivity.this);
+		final ArrayList<String> msgList=smdatabase.getPresetMessages();
+		ArrayAdapter<String> adapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.savemessage_list_row,msgList);
+		listmsg.setAdapter(adapter);
+		listmsg.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position,
+					long id) {
+
+				edtmsg.setText(edtmsg.getText().toString()+" "+msgList.get(position));
+				dialog.dismiss();
+				
+			}
+		});
+		dialog.show();
 	}
 	public void toast(String str)
 	{

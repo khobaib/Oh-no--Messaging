@@ -61,5 +61,25 @@ public class SavedMessageDatabase  extends SQLiteOpenHelper{
 		db.close();
 		return list;
 	}
-
+	public ArrayList<String> getPresetMessages()
+	{
+		ArrayList<String> list=new ArrayList<String>();
+		SQLiteDatabase db=this.getReadableDatabase();
+		String[] colums={"msg"};
+		Cursor c=db.query(presetmessagetable, colums, null,null,null,null,null);
+		while(c.moveToNext())
+			list.add(c.getString(0));
+		c.close();
+		db.close();
+		return list;
+	}
+	public void insertPresetmessage(String body)
+	{
+		SQLiteDatabase db=this.getWritableDatabase();
+		ContentValues values=new ContentValues();
+		values.put("msg",body);
+		db.insert(presetmessagetable,null, values);
+		db.close();
+		
+	}
 }

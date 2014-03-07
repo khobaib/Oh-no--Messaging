@@ -59,6 +59,7 @@
             android:theme="@style/DialogTheme" >
         </activity>
         <activity android:name="com.smartengine.ohnomessaging.SavedMessagesActivity"></activity>
+        <activity android:name="com.smartengine.ohnomessaging.PresetMessagesActivity"></activity>
     </application>
 
 </manifest>

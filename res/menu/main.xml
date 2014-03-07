@@ -5,19 +5,17 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
-   <item
+    <item
         android:id="@+id/insert_contact"
-        android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/insert_contacts"
-      />
-   <item
+        android:title="@string/insert_contacts"/>
+    <item
         android:id="@+id/saved_messages"
-        android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/saved_messages"
-      />
-     
-    
+        android:title="@string/saved_messages"/>
+    <item
+        android:id="@+id/preset_messages"
+        android:showAsAction="ifRoom"
+        android:title="@string/preset_messages"/>
 
 </menu>
