@@ -22,14 +22,18 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -37,7 +41,9 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import com.bugsense.trace.BugSenseHandler;
 import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
+import com.smartengine.ohnomessaging.adapter.NothingSelectedSpinnerAdapter;
 import com.smartengine.ohnomessaging.adapter.ThreadMessageAdapter;
+import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
 import com.smartengine.ohnomessaging.view.CustomListView;
@@ -80,11 +86,46 @@ public class ContactSelectedNewMessageActivity extends Activity {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
-                TextMessage selectedMessage = (TextMessage) parent.getItemAtPosition(position);
+            	
+            	TextMessage selectedMessage = (TextMessage) parent.getItemAtPosition(position);
                 
-                int msgId = selectedMessage.getId();
-                Log.e(">>>>", "deleting msg id = " + msgId);
-                showDeleteDialog(msgId);
+                final int msgId = selectedMessage.getId();
+                final String msg=selectedMessage.getMessageBody();
+            	Spinner spinner=(Spinner)parent.findViewById(R.id.spinner_msg_option);
+            	ArrayList<String> list=new ArrayList<String>();
+            	list.add("Save Message");
+            	list.add("Delete");
+            	ArrayAdapter<String> adapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_row_view,list);
+            	spinner.setAdapter(new NothingSelectedSpinnerAdapter(adapter,R.layout.spinner_row_view,ContactSelectedNewMessageActivity.this));
+            	spinner.performClick();
+            	spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View v,
+							int position, long id) {
+						if(position==1)
+						{
+							SavedMessageDatabase smdatabase=new SavedMessageDatabase(ContactSelectedNewMessageActivity.this);
+							smdatabase.insertsavedmessage(msg);
+							Toast.makeText(getApplicationContext(),"Message Saved",Toast.LENGTH_LONG).show();
+						}
+						else if(position==2)
+						{
+							
+			             
+			             
+							showDeleteDialog(msgId);
+						}
+						
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+                
                 return false;
             }
         });
@@ -149,6 +190,7 @@ public class ContactSelectedNewMessageActivity extends Activity {
 //                messageList, myUserPic, otherUserPic);
 //        ThreadMessageList.setAdapter(threadMessageAdapter);
     }
+   
     
     @Override
     protected void onStart() {

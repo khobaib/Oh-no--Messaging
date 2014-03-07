@@ -58,6 +58,7 @@
             android:name="com.smartengine.ohnomessaging.QuickReplyActivity"
             android:theme="@style/DialogTheme" >
         </activity>
+        <activity android:name="com.smartengine.ohnomessaging.SavedMessagesActivity"></activity>
     </application>
 
 </manifest>

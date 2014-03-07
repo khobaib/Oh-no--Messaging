@@ -50,5 +50,11 @@
         android:layout_height="0dp"
         android:layout_below="@+id/tv_message_time"
         android:layout_marginTop="6dp" />
+    <Spinner
+        android:id="@+id/spinner_msg_option"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_below="@+id/tv_message_body" 
+        android:spinnerMode="dialog"/>
 
 </RelativeLayout>

@@ -285,10 +285,10 @@ public class NewMessageActivity extends Activity implements
 			
 		});
 		dialog.show();
-		DisplayMetrics metrics = new DisplayMetrics();
+		/*DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-		dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);
+		dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);*/
 	}
 
 	public ArrayList<Contact> getContacts() {
@@ -341,6 +341,12 @@ public class NewMessageActivity extends Activity implements
 		{
 			Intent intent=new Intent(getApplicationContext(),SettingsActivity.class);
 			startActivity(intent);
+		}
+		else if(item.getItemId()==R.id.saved_messages)
+		{
+			Intent intent=new Intent(getApplicationContext(),SavedMessagesActivity.class);
+			startActivity(intent);
+			
 		}
 
 		return super.onOptionsItemSelected(item);
