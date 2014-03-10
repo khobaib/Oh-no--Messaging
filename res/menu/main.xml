@@ -17,5 +17,10 @@
         android:id="@+id/preset_messages"
         android:showAsAction="ifRoom"
         android:title="@string/preset_messages"/>
+     <item
+        android:id="@+id/create_blocklist"
+        android:showAsAction="ifRoom"
+        android:title="@string/create_blocklist"/>
+    
 
 </menu>

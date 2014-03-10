@@ -7,5 +7,6 @@
     <string name="insert_contacts">Insert Contacts</string>
     <string name="saved_messages">Save Messages</string>
     <string name="preset_messages">Preset Messages</string>
+     <string name="create_blocklist"> Blocklist</string>
 
 </resources>

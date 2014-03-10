@@ -39,6 +39,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
 import com.smartengine.ohnomessaging.adapter.NothingSelectedSpinnerAdapter;
+import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
 
@@ -134,7 +135,7 @@ public class InboxActivity extends Activity {
 					int position, long id) {
 
 				final ArrayList<String> list = new ArrayList<String>();
-				TextMessage selectedMessage = (TextMessage) parent
+				final TextMessage selectedMessage = (TextMessage) parent
 						.getItemAtPosition(position);
 				final int threadId = selectedMessage.getThreadId();
 				Spinner spinner = (Spinner) parent
@@ -143,6 +144,7 @@ public class InboxActivity extends Activity {
 				//list.add("Options");
 				String option = setLockUnLockOption(threadId);
 				list.add(option);
+				list.add("Add To BlockList");
 				list.add("DELETE");
 														
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -165,7 +167,14 @@ public class InboxActivity extends Activity {
 
 								showUnlockDialog(threadId);
 							}
-						} else if (position == 2)
+						} 
+						else if (position == 2)
+						{
+							SavedMessageDatabase smDataBase=new SavedMessageDatabase(InboxActivity.this);
+							smDataBase.insertItemToBlockList(selectedMessage.getContactName(),selectedMessage.getPhoneNumber());
+							toast("Added To Blocklist");
+						}
+						else if (position == 3)
 							showDeleteDialog(threadId);
 						
 						
@@ -238,6 +247,7 @@ public class InboxActivity extends Activity {
 			list.add("UNLOCK");
 		} else
 			list.add("LOCK");
+		//list.add("Add To Block List");
 		list.add("DELETE");
 		final int tid = threadId;
 		lngpressoptionsdialog
@@ -272,7 +282,9 @@ public class InboxActivity extends Activity {
 						showUnlockDialog(tid);
 					}
 					lngpressoptionsdialog.dismiss();
-				} else if (position == 2) {
+				}
+				
+				else if (position == 2) {
 					showDeleteDialog(tid);
 				}
 

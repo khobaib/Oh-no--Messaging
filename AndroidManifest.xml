@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="17" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
@@ -60,6 +60,7 @@
         </activity>
         <activity android:name="com.smartengine.ohnomessaging.SavedMessagesActivity"></activity>
         <activity android:name="com.smartengine.ohnomessaging.PresetMessagesActivity"></activity>
+        <activity android:name="com.smartengine.ohnomessaging.CreateBlockListActivity"></activity>
     </application>
 
 </manifest>

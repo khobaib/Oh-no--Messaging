@@ -354,6 +354,14 @@ public class NewMessageActivity extends Activity implements
 			startActivity(intent);
 			
 		}
+		else if(item.getItemId()==R.id.create_blocklist)
+		{
+			Intent intent=new Intent(getApplicationContext(),CreateBlockListActivity.class);
+			startActivity(intent);
+			
+		}
+		
+		
 
 		return super.onOptionsItemSelected(item);
 	}
