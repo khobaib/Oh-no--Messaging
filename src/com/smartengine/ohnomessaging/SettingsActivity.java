@@ -38,6 +38,7 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		btnsavepaswrd.setOnClickListener(this);
 		btnrchangepassword.setOnClickListener(this);
 		btnsettingsPopup.setOnClickListener(this);
+		setPopUpButtonText();
 	}
 
 	@Override
@@ -64,7 +65,7 @@ public class SettingsActivity extends Activity implements OnClickListener {
 	}
 	public void ChangePopUpSetting()
 	{
-		if(btnsettingsPopup.getText().toString().equals("on"))
+		if(btnsettingsPopup.getText().toString().endsWith("on"))
 		{
 
 			SharedPreferences.Editor editor = PreferenceManager
@@ -72,16 +73,16 @@ public class SettingsActivity extends Activity implements OnClickListener {
 					.edit();
 			editor.putString("popup", "0");
 			editor.commit();
-			btnsettingsPopup.setText("off");
+			btnsettingsPopup.setText("Popup: off");
 		}
-		else if(btnsettingsPopup.getText().toString().equals("off"))
+		else if(btnsettingsPopup.getText().toString().endsWith("off"))
 		{
 			SharedPreferences.Editor editor = PreferenceManager
 					.getDefaultSharedPreferences(SettingsActivity.this)
 					.edit();
 			editor.putString("popup", "1");
 			editor.commit();
-			btnsettingsPopup.setText("on");
+			btnsettingsPopup.setText("Popup: on");
 		}
 	}
 public void setPopUpButtonText()
@@ -90,9 +91,9 @@ public void setPopUpButtonText()
 			.getDefaultSharedPreferences(SettingsActivity.this);
 	String popup = prefs.getString("popup" ,"-1");
 	if(popup.equals("0"))
-		btnsettingsPopup.setText("off");
+		btnsettingsPopup.setText("Popup: off");
 	else
-		btnsettingsPopup.setText("on");
+		btnsettingsPopup.setText("Popup: on");
 		
 	
 }
