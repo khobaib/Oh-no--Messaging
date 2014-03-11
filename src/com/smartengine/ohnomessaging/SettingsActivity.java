@@ -7,6 +7,7 @@ import com.smartengine.ohnomessaging.adapter.ContactListadapter;
 import com.smartengine.ohnomessaging.model.Contact;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 public class SettingsActivity extends Activity implements OnClickListener {
 	private Button btnsavepaswrd;
 	private Button btnrchangepassword;
+	private Button btnsettingsPopup;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +34,10 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.settings_activity);
 		btnsavepaswrd = (Button) findViewById(R.id.buttonsetpasswrd);
 		btnrchangepassword = (Button) findViewById(R.id.buttonchangepasswrd);
+		btnsettingsPopup=(Button)findViewById(R.id.buttonpopupsetting);
 		btnsavepaswrd.setOnClickListener(this);
 		btnrchangepassword.setOnClickListener(this);
+		btnsettingsPopup.setOnClickListener(this);
 	}
 
 	@Override
@@ -51,9 +55,47 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		}
 		else if(v.getId()==R.id.buttonchangepasswrd)
 			showPasswordChangeDialog();
+		else if(v.getId()==R.id.buttonpopupsetting)
+		{
+			ChangePopUpSetting();
+		}
+			
 
 	}
+	public void ChangePopUpSetting()
+	{
+		if(btnsettingsPopup.getText().toString().equals("on"))
+		{
 
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(SettingsActivity.this)
+					.edit();
+			editor.putString("popup", "0");
+			editor.commit();
+			btnsettingsPopup.setText("off");
+		}
+		else if(btnsettingsPopup.getText().toString().equals("off"))
+		{
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(SettingsActivity.this)
+					.edit();
+			editor.putString("popup", "1");
+			editor.commit();
+			btnsettingsPopup.setText("on");
+		}
+	}
+public void setPopUpButtonText()
+{
+	SharedPreferences prefs = PreferenceManager
+			.getDefaultSharedPreferences(SettingsActivity.this);
+	String popup = prefs.getString("popup" ,"-1");
+	if(popup.equals("0"))
+		btnsettingsPopup.setText("off");
+	else
+		btnsettingsPopup.setText("on");
+		
+	
+}
 	public void showPasswrdSetDialog() {
 		final Dialog dialog = new Dialog(SettingsActivity.this);
 		dialog.setContentView(R.layout.set_password);

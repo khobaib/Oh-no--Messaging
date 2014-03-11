@@ -6,21 +6,23 @@ import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.InboxActivity;
 import com.smartengine.ohnomessaging.NewMessageActivity;
 import com.smartengine.ohnomessaging.SMSPopupActivity;
+import com.smartengine.ohnomessaging.SettingsActivity;
 import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
 import com.smartengine.ohnomessaging.utils.SMSPopUpUtility;
 
-
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.TextView;
@@ -34,7 +36,7 @@ public class SMSReceiver extends BroadcastReceiver {
 	long tid;
 	int mid;
 	public ArrayList<TextMessage> smsInbox = new ArrayList<TextMessage>();
-	private ArrayList<String> msg=new ArrayList<String>();
+	private ArrayList<String> msg = new ArrayList<String>();
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -44,29 +46,37 @@ public class SMSReceiver extends BroadcastReceiver {
 		Intent popup = new Intent(context, SMSPopupActivity.class);
 		popup.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-		SmsMessage[] msgs = getMessageFromIntent(intent);
-		
-		number = msgs[0].getOriginatingAddress();
-		time = msgs[0].getTimestampMillis() + "";
-		body= msgs[0].getMessageBody().toString();
-		msg.add(msgs[0].getOriginatingAddress());
-		msg.add(msgs[0].getMessageBody());
-		popup.putStringArrayListExtra("msg",msg);
-		SMSPopUpUtility smsutil=new SMSPopUpUtility();
-		//smsutil.SmsMmsMessage(context, msgs, 0);
-		String address=smsutil.getAddress(context,msgs);
-		tid=smsutil.findThreadIdFromAddress(context, address);
-		popup.putExtra("tid",tid);
-		if(isInBlockList(number))
-		{
-			//new DeleteSMS().execute();
-			new ThreadDeleteSMS().run();
-			toast("Is In BlockList");
+		if (isPopUpEnabled()) {
+			SmsMessage[] msgs = getMessageFromIntent(intent);
+			number = msgs[0].getOriginatingAddress();
+			time = msgs[0].getTimestampMillis() + "";
+			body = msgs[0].getMessageBody().toString();
+			msg.add(msgs[0].getOriginatingAddress());
+			msg.add(msgs[0].getMessageBody());
+			popup.putStringArrayListExtra("msg", msg);
+			SMSPopUpUtility smsutil = new SMSPopUpUtility();
+			// smsutil.SmsMmsMessage(context, msgs, 0);
+			String address = smsutil.getAddress(context, msgs);
+			tid = smsutil.findThreadIdFromAddress(context, address);
+			popup.putExtra("tid", tid);
+			if (isInBlockList(number)) {
+				// new DeleteSMS().execute();
+				new ThreadDeleteSMS().run();
+				toast("Is In BlockList");
+			} else
+				context.startActivity(popup);
 		}
-		else
-			context.startActivity(popup);
-	
 
+	}
+
+	public boolean isPopUpEnabled() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		String popup = prefs.getString("popup", "-1");
+		if (popup.equals("0"))
+			return false;
+		else
+			return true;
 	}
 
 	public void showPopUp(Intent i) {
@@ -96,28 +106,25 @@ public class SMSReceiver extends BroadcastReceiver {
 			return null;
 
 	}
-	public boolean isInBlockList(String number)
-	{
-		ArrayList<Contact> list=new ArrayList<Contact>();
-		SavedMessageDatabase smDatabase=new SavedMessageDatabase(context);
-		list=smDatabase.getBlockedList();
-		for(int i=0;i<list.size();i++)
-		{
-			if(list.get(i).getPhoneNumber().equals(number) )
-			{
-			
+
+	public boolean isInBlockList(String number) {
+		ArrayList<Contact> list = new ArrayList<Contact>();
+		SavedMessageDatabase smDatabase = new SavedMessageDatabase(context);
+		list = smDatabase.getBlockedList();
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).getPhoneNumber().equals(number)) {
+
 				return true;
-				
+
 			}
 		}
-		
-		return false;
-		
-	}
-	public class DeleteSMS extends AsyncTask<Void,Void,Void>
-	{
 
-		
+		return false;
+
+	}
+
+	public class DeleteSMS extends AsyncTask<Void, Void, Void> {
+
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
@@ -128,22 +135,22 @@ public class SMSReceiver extends BroadcastReceiver {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			return null;
 		}
+
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			toast("msg deleted");
 		}
-		
+
 	}
-	public void FindMsgId()
-	{
-		
+
+	public void FindMsgId() {
 
 		Uri uriSms = Uri.parse("content://sms");
-		Log.v("msg","here");
+		Log.v("msg", "here");
 		Cursor c = context.getContentResolver().query(
 				uriSms,
 				new String[] { "_id", "thread_id", "address", "date", "body",
@@ -151,7 +158,7 @@ public class SMSReceiver extends BroadcastReceiver {
 				"type=" + Constants.TYPE_INCOMING_MESSAGE + " OR type="
 						+ Constants.TYPE_SENT_MESSAGE, null,
 				"date" + " COLLATE LOCALIZED DESC");
-		Log.v("msg","after cursor");
+		Log.v("msg", "after cursor");
 		if (c != null && c.getCount() > 0) {
 			c.moveToFirst();
 			while (!c.isAfterLast()) {
@@ -165,10 +172,9 @@ public class SMSReceiver extends BroadcastReceiver {
 							.getColumnIndexOrThrow("address"));
 					String messageBody = c.getString(c
 							.getColumnIndexOrThrow("body"));
-					if(threadId==tid && messageBody.equals(body))
-					{
-						mid=id;
-						Log.v("msg","break"+mid);
+					if (threadId == tid && messageBody.equals(body)) {
+						mid = id;
+						Log.v("msg", "break" + mid);
 						break;
 					}
 					int msgType = c.getInt(c.getColumnIndexOrThrow("type"));
@@ -184,23 +190,23 @@ public class SMSReceiver extends BroadcastReceiver {
 					message.setMessageCount(1);
 					smsInbox.add(message);
 
-					
 				}
 				c.moveToNext();
 			}
 		}
-		 
+
 		c.close();
 	}
-	public void  deletemsg()
-	{
+
+	public void deletemsg() {
 		Uri deleteUri = Uri.parse("content://sms");
-        context.getContentResolver().delete(deleteUri, "_id=" + mid, null);
-        Log.v("msg",""+mid);
-		
+		context.getContentResolver().delete(deleteUri, "_id=" + mid, null);
+		Log.v("msg", "" + mid);
+
 	}
+
 	private Boolean isThreadIdFound(int threadId) {
-		Log.v("msg","thread");
+		Log.v("msg", "thread");
 		for (TextMessage tMsg : smsInbox) {
 			if (tMsg.getThreadId() == threadId) {
 				tMsg.setMessageCount(tMsg.getMessageCount() + 1);
@@ -210,13 +216,13 @@ public class SMSReceiver extends BroadcastReceiver {
 		// threadIdList.add(threadId);
 		return false;
 	}
-	
-	public void toast(String str)
-	{
-		Toast.makeText(context.getApplicationContext(),str,Toast.LENGTH_LONG).show();
+
+	public void toast(String str) {
+		Toast.makeText(context.getApplicationContext(), str, Toast.LENGTH_LONG)
+				.show();
 	}
-	public class ThreadDeleteSMS implements Runnable
-	{
+
+	public class ThreadDeleteSMS implements Runnable {
 
 		@Override
 		public void run() {
@@ -228,9 +234,9 @@ public class SMSReceiver extends BroadcastReceiver {
 			}
 			FindMsgId();
 			deletemsg();
-			
+
 		}
-		
+
 	}
 
 }

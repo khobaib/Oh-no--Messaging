@@ -15,5 +15,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Change Password" />
-
+ <Button
+        android:id="@+id/buttonpopupsetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:text="off" />
 </LinearLayout>
