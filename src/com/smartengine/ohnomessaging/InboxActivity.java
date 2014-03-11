@@ -2,13 +2,17 @@ package com.smartengine.ohnomessaging;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import android.R.bool;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
@@ -41,6 +45,7 @@ import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
 import com.smartengine.ohnomessaging.adapter.NothingSelectedSpinnerAdapter;
 import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.TextMessage;
+import com.smartengine.ohnomessaging.receiver.AlarmReceiver;
 import com.smartengine.ohnomessaging.utils.Constants;
 
 public class InboxActivity extends Activity {
@@ -66,6 +71,7 @@ public class InboxActivity extends Activity {
 		BugSenseHandler.initAndStartSession(this, Constants.BUGSENSE_API_KEY);
 
 		setContentView(R.layout.activity_inbox);
+		setAlarm();
 		initViews();
 
 	}
@@ -562,6 +568,42 @@ public class InboxActivity extends Activity {
 	public void onClickNewMessage(View v) {
 		Intent i = new Intent(InboxActivity.this, NewMessageActivity.class);
 		startActivity(i);
+	}
+	private void setAlarm()
+	{
+		
+		//if(!isAlarmSet())
+		//{
+			AlarmManager alarmManager=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+			Intent intent=new Intent(getApplicationContext(),AlarmReceiver.class);
+			PendingIntent alarmIntent=PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+			Calendar calendar=Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			calendar.set(Calendar.HOUR_OF_DAY,18);
+			calendar.set(Calendar.MINUTE,18);
+			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),1000*60,alarmIntent);
+			
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(InboxActivity.this)
+					.edit();
+			editor.putString("alarm", "1");
+			editor.commit();
+			toast("alarm is set now");
+			
+		//}
+		
+	}
+	private  boolean isAlarmSet()
+	{
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(InboxActivity.this);
+		String isAlarm = prefs.getString("alarm" ,"-1");
+		if(isAlarm.equals("-1"))
+			return false;
+		else
+			return true;
+		
+		
 	}
 
 }
