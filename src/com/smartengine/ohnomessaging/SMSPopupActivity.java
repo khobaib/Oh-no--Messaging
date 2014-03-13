@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.view.View;
@@ -19,69 +20,95 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ohnomessaging.R;
+import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.model.TextMessage;
 import com.smartengine.ohnomessaging.utils.Constants;
 import com.smartengine.ohnomessaging.utils.SMSPopUpUtility;
 
-public class SMSPopupActivity extends Activity implements OnClickListener{
-	
+public class SMSPopupActivity extends Activity implements OnClickListener {
+
 	private TextView txtName;
 	private TextView txtMsgBody;
+	private TextView txtNumber;
 	private ArrayList<String> smsmsg;
 	ArrayList<TextMessage> smsInbox;
-	private Button btnClose,btnReply,btnDelete;
-	int mid=0;
+	private Button btnClose, btnReply, btnDelete;
+	int mid = 0;
 	long threadid;
 	String msgBody;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.smspopup);
-		txtName=(TextView)findViewById(R.id.textcnatctname);
-		txtMsgBody=(TextView)findViewById(R.id.txtmsg);
-		btnClose=(Button)findViewById(R.id.buttonclose);
-		btnReply=(Button)findViewById(R.id.buttonreply);
-		btnDelete=(Button)findViewById(R.id.buttondelete);
-		Intent intent=getIntent();
-		smsmsg=intent.getStringArrayListExtra("msg");
-		txtName.setText(smsmsg.get(0));
+		txtName = (TextView) findViewById(R.id.textcnatctname);
+		txtNumber = (TextView) findViewById(R.id.textcnatctnumber);
+		txtMsgBody = (TextView) findViewById(R.id.txtmsg);
+		btnClose = (Button) findViewById(R.id.buttonclose);
+		btnReply = (Button) findViewById(R.id.buttonreply);
+		btnDelete = (Button) findViewById(R.id.buttondelete);
+		Intent intent = getIntent();
+		smsmsg = intent.getStringArrayListExtra("msg");
+		txtNumber.setText(smsmsg.get(0));
 		txtMsgBody.setText(smsmsg.get(1));
-		msgBody=smsmsg.get(1);
-		threadid= intent.getLongExtra("tid",-1);
+		setName();
+		msgBody = smsmsg.get(1);
+		threadid = intent.getLongExtra("tid", -1);
 		btnClose.setOnClickListener(this);
 		btnDelete.setOnClickListener(this);
 		btnReply.setOnClickListener(this);
-	
-		
-		
-		
+
+	}
+
+	public void setName() {
+
+		Cursor phones = getContentResolver().query(
+				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+				null, null);
+		while (phones.moveToNext()) {
+			String name = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			String phoneNumber = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+			if(smsmsg.get(0).contains(phoneNumber))
+			{
+				Log.v("phone",phoneNumber);
+				txtName.setText(name);
+				break;
+			}
+
+		}
+		phones.close();
+
+
 	}
 
 	@Override
 	public void onClick(View v) {
-		
-		if(v.getId()==R.id.buttonclose){
+
+		if (v.getId() == R.id.buttonclose) {
 			new MarkSMSAsRead().execute();
-			
-		}
-		else if(v.getId()==R.id.buttonreply)
-		{
-			Intent intent=new Intent(getApplicationContext(),QuickReplyActivity.class);
-			finish();
-			intent.putExtra("number",smsmsg.get(0));
+
+		} else if (v.getId() == R.id.buttonreply) {
+			Intent intent = new Intent(getApplicationContext(),
+					QuickReplyActivity.class);
+			// finish();
+			new MarkSMSAsRead().execute();
+			intent.putExtra("number", smsmsg.get(0));
+			intent.putExtra("name",txtName.getText().toString());
 			startActivity(intent);
-			
-		}
-		else if(v.getId()==R.id.buttondelete)
-		{
+
+		} else if (v.getId() == R.id.buttondelete) {
 			new DeleteSMS().execute();
 			finish();
 		}
-		
+
 	}
-	public void FindMsgId()
-	{
+
+	public void FindMsgId() {
 		smsInbox = new ArrayList<TextMessage>();
 
 		Uri uriSms = Uri.parse("content://sms");
@@ -106,10 +133,9 @@ public class SMSPopupActivity extends Activity implements OnClickListener{
 							.getColumnIndexOrThrow("address"));
 					String messageBody = c.getString(c
 							.getColumnIndexOrThrow("body"));
-					if(threadId==threadid && messageBody.equals(msgBody))
-					{
-						mid=id;
-						Log.v("msg","break"+mid);
+					if (threadId == threadid && messageBody.equals(msgBody)) {
+						mid = id;
+						Log.v("msg", "break" + mid);
 						break;
 					}
 					int msgType = c.getInt(c.getColumnIndexOrThrow("type"));
@@ -125,21 +151,21 @@ public class SMSPopupActivity extends Activity implements OnClickListener{
 					message.setMessageCount(1);
 					smsInbox.add(message);
 
-					
 				}
 				c.moveToNext();
 			}
 		}
-		 
+
 		c.close();
 	}
-	public void  deletemsg()
-	{
+
+	public void deletemsg() {
 		Uri deleteUri = Uri.parse("content://sms");
-        getContentResolver().delete(deleteUri, "_id=" + mid, null);
-        Log.v("msg",""+mid);
-		
+		getContentResolver().delete(deleteUri, "_id=" + mid, null);
+		Log.v("msg", "" + mid);
+
 	}
+
 	private Boolean isThreadIdFound(int threadId) {
 		for (TextMessage tMsg : smsInbox) {
 			if (tMsg.getThreadId() == threadId) {
@@ -150,51 +176,48 @@ public class SMSPopupActivity extends Activity implements OnClickListener{
 		// threadIdList.add(threadId);
 		return false;
 	}
-	public class DeleteSMS extends AsyncTask<Void,Void,Void>
-	{
 
-		
+	public class DeleteSMS extends AsyncTask<Void, Void, Void> {
+
 		@Override
 		protected Void doInBackground(Void... params) {
 			FindMsgId();
 			deletemsg();
 			return null;
 		}
+
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			toast("msg deleted");
 		}
-		
-	}
-	public void toast(String str)
-	{
-		Toast.makeText(getApplicationContext(),str,Toast.LENGTH_LONG).show();
-	}
-	public class MarkSMSAsRead extends AsyncTask<Void,Void,Void>
-	{
 
-		
+	}
+
+	public void toast(String str) {
+		Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
+	}
+
+	public class MarkSMSAsRead extends AsyncTask<Void, Void, Void> {
+
 		@Override
 		protected Void doInBackground(Void... params) {
 			FindMsgId();
-			
-			
+
 			return null;
 		}
+
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			ContentValues values = new ContentValues();
-			values.put("read",true);
-			getContentResolver().update(Uri.parse("content://sms/inbox"),values,
-			    "_id="+mid, null);
+			values.put("read", true);
+			getContentResolver().update(Uri.parse("content://sms/inbox"),
+					values, "_id=" + mid, null);
 			finish();
-			
-		}
-		
-	}
-		
 
+		}
+
+	}
 
 }

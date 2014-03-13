@@ -3,14 +3,17 @@ package com.smartengine.ohnomessaging.dbhelper;
 import java.util.ArrayList;
 
 import com.smartengine.ohnomessaging.model.Contact;
+import com.smartengine.ohnomessaging.model.Friend;
 import com.smartengine.ohnomessaging.model.TextMessage;
 
+import android.R.array;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 public class SavedMessageDatabase extends SQLiteOpenHelper {
@@ -20,6 +23,7 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 	private String savedmessagetable = "savedmessage";
 	private String presetmessagetable = "presetmessage";
 	private String blocklistable = "blocklist";
+	private String friendbirthdays = "frinedbirthdays";
 
 	public SavedMessageDatabase(Context context) {
 		super(context, Databasename, null, Databasevertion);
@@ -37,6 +41,13 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		sql = "create table " + blocklistable + "(" + "_id "
 				+ "INTEGER PRIMARY KEY AUTOINCREMENT," + " name " + " TEXT ,"
 				+ " phone " + " TEXT " + ")";
+
+		db.execSQL(sql);
+		sql = "create table " + friendbirthdays + "(" + "_id "
+				+ "INTEGER PRIMARY KEY AUTOINCREMENT," + " name " + " TEXT ,"
+				+ " phone " + " TEXT, " + " uid " + "TEXT, " + "birthday "
+				+ " TEXT" + ")";
+
 		db.execSQL(sql);
 
 	}
@@ -116,30 +127,143 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		return list;
 
 	}
-	public void  deleteEntryFromBlockList(String number){
-		
-		SQLiteDatabase db=this.getWritableDatabase();
-		//String sql="DELETE from "+ blocklistable+" WHERE  phone= "+number;
-		//db.execSQL(sql);
-		db.delete(blocklistable,"_id = "+getId(number),null);
+
+	public void deleteEntryFromBlockList(String number) {
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		// String sql="DELETE from "+ blocklistable+" WHERE  phone= "+number;
+		// db.execSQL(sql);
+		db.delete(blocklistable, "_id = " + getId(number), null);
 		db.close();
-		
+
 	}
-	public int  getId(String number)
-	{
+
+	public int getId(String number) {
 		ArrayList<Contact> list = new ArrayList<Contact>();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String[] colums = {"_id","phone" };
+		String[] colums = { "_id", "phone" };
 		Cursor c = db
 				.query(blocklistable, colums, null, null, null, null, null);
 		while (c.moveToNext()) {
-			if(c.getString(1).equals(number))
+			if (c.getString(1).equals(number))
 				return c.getInt(0);
 		}
 		c.close();
 		db.close();
 		return -1;
-		
+
 	}
-	
+	public void deleteSavedMessage(String body)
+	{
+		SQLiteDatabase db=this.getWritableDatabase();
+		db.delete(savedmessagetable,"_id= "+getSavedMessageID(body),null);
+		db.close();
+	}
+	public int getSavedMessageID(String body)
+	{
+		SQLiteDatabase db=this.getWritableDatabase();
+		String[] colums={"_id","msg"};
+		Cursor c = db
+				.query(savedmessagetable, colums, null, null, null, null, null);
+		while (c.moveToNext()) {
+			if (c.getString(1).equals(body))
+				return c.getInt(0);
+		}
+		c.close();
+		db.close();
+		return -1;
+	}
+	public void deletePresetMessage(String body)
+	{
+		SQLiteDatabase db=this.getWritableDatabase();
+		db.delete(presetmessagetable,"_id= "+getPresetMessageID(body),null);
+		db.close();
+	}
+	public int getPresetMessageID(String body)
+	{
+		SQLiteDatabase db=this.getWritableDatabase();
+		String[] colums={"_id","msg"};
+		Cursor c = db
+				.query(presetmessagetable, colums, null, null, null, null, null);
+		while (c.moveToNext()) {
+			if (c.getString(1).equals(body))
+				return c.getInt(0);
+		}
+		//c.close();
+		//db.close();
+		return -1;
+	}
+
+
+	public void insertBirthDays(ArrayList<Friend> list) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		int size = list.size();
+		for (int i = 0; i < size; i++) {
+			values.put("name", list.get(i).getName());
+			values.put("uid", list.get(i).getUid());
+			values.put("birthday", list.get(i).getBirthDay());
+			db.insert(friendbirthdays, null, values);
+		}
+		db.close();
+	}
+
+	public ArrayList<Friend> getFriendBirthDays() {
+		ArrayList<Friend> list = new ArrayList<Friend>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		String[] colums = { "name", "uid", "birthday" };
+		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
+				null, null, null);
+		while (cursor.moveToNext()) {
+			list.add(new Friend(cursor.getString(0), cursor.getString(1),
+					cursor.getString(2)));
+		}
+		cursor.close();
+		db.close();
+		return list;
+	}
+
+	public void deleteAllRecordsFromBirthdays() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(friendbirthdays, null, null);
+		db.close();
+	}
+
+	public ArrayList<String> getBirthDay(String mon, String day) {
+		SQLiteDatabase db = this.getReadableDatabase();
+		ArrayList<String> list = new ArrayList<String>();
+		String[] colums = { "name", "uid", "birthday" };
+		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
+				null, null, null);
+		while (cursor.moveToNext()) {
+			String birthday = cursor.getString(2);
+			String[] array;
+			if (birthday.contains(",")) {
+				array = birthday.split(",");
+				birthday = array[0];
+			}
+			String date = "";
+			if (birthday.contains(" ")) {
+				array = birthday.split(" ");
+				date = array[1];
+			}
+
+			if (birthday.contains(mon) && date.equals(day)) {
+				Log.v("msg", date);
+				list.add(cursor.getString(0) + "," + cursor.getString(2));
+			}
+
+		}
+		cursor.close();
+		db.close();
+		return list;
+
+	}
+
+	public String getMonthAndDate(String birth) {
+		String[] array = birth.split(".");
+		array = array[0].split(" ");
+		return array[0];
+	}
+
 }

@@ -7,6 +7,10 @@
     <string name="insert_contacts">Insert Contacts</string>
     <string name="saved_messages">Save Messages</string>
     <string name="preset_messages">Preset Messages</string>
-     <string name="create_blocklist"> Blocklist</string>
+    <string name="create_blocklist"> Blocklist</string>
+    <string name="Facebook_friend_BirthDays">Facebook Friend BirthDays</string>
+    <string name="Facebook_friend_login_text">Press the login button to get Syncronize facebook friend Birthdays</string>
+    <string name="app_id">304156206399452</string>
+    
 
 </resources>

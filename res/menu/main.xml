@@ -21,6 +21,10 @@
         android:id="@+id/create_blocklist"
         android:showAsAction="ifRoom"
         android:title="@string/create_blocklist"/>
+      <item
+        android:id="@+id/fb_frined_birthdays"
+        android:showAsAction="ifRoom"
+        android:title="@string/Facebook_friend_BirthDays"/>
     
 
 </menu>

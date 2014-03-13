@@ -1,8 +1,12 @@
 package com.smartengine.ohnomessaging;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 
+import android.R.integer;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -10,13 +14,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
+import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +43,11 @@ import com.bugsense.trace.BugSenseHandler;
 import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.ContactListadapter;
 import com.smartengine.ohnomessaging.adapter.ContactsAdapter;
+import com.smartengine.ohnomessaging.comparator.SortContactsByName;
+import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.Contact;
+import com.smartengine.ohnomessaging.model.Friend;
+import com.smartengine.ohnomessaging.receiver.AlarmReceiver;
 import com.smartengine.ohnomessaging.utils.Constants;
 import com.smartengine.ohnomessaging.utils.Utility;
 import com.smartengine.ohnomessaging.view.ContactsCompletionView;
@@ -75,6 +86,8 @@ public class NewMessageActivity extends Activity implements
 
 		// strContacts = null;
 		// phoneNumbers = new ArrayList<String>();
+		//setAlarm();
+		
 		defaultUserPic = BitmapFactory.decodeResource(getResources(),
 				R.drawable.ic_contact_picture2);
 
@@ -266,29 +279,36 @@ public class NewMessageActivity extends Activity implements
 		dialog.setTitle("Pic Number");
 		ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
 		final ArrayList<Contact> contactList = getContacts();
-		Log.v("msg",""+contactList.size());
-		 ContactListadapter adapter = new ContactListadapter(
+		Collections.sort(contactList,new SortContactsByName());
+		Log.v("msg", "" + contactList.size());
+		ContactListadapter adapter = new ContactListadapter(
 				getApplicationContext(), R.layout.list_view_contact_row,
 				contactList);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				String text=MessageBody.getText().toString();
-				text=text+"\n"+"Name: "+contactList.get(position).getDisplayName()+"\n phone Number:"+contactList.get(position).getPhoneNumber();
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				String text = MessageBody.getText().toString();
+				text = text + "\n" + "Name: "
+						+ contactList.get(position).getDisplayName()
+						+ "\n phone Number:"
+						+ contactList.get(position).getPhoneNumber();
 				MessageBody.setText(text);
 				dialog.dismiss();
-				
+
 			}
-			
+
 		});
 		dialog.show();
-		/*DisplayMetrics metrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-		dialog.getWindow().setLayout(metrics.heightPixels, metrics.widthPixels);*/
+		/*
+		 * DisplayMetrics metrics = new DisplayMetrics();
+		 * getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		 * 
+		 * dialog.getWindow().setLayout(metrics.heightPixels,
+		 * metrics.widthPixels);
+		 */
 	}
 
 	public ArrayList<Contact> getContacts() {
@@ -336,34 +356,77 @@ public class NewMessageActivity extends Activity implements
 		if (item.getItemId() == R.id.insert_contact) {
 			showDialog();
 
-		}
-		else if (item.getItemId()==R.id.action_settings)
-		{
-			Intent intent=new Intent(getApplicationContext(),SettingsActivity.class);
+		} else if (item.getItemId() == R.id.action_settings) {
+			Intent intent = new Intent(getApplicationContext(),
+					SettingsActivity.class);
 			startActivity(intent);
-		}
-		else if(item.getItemId()==R.id.saved_messages)
-		{
-			Intent intent=new Intent(getApplicationContext(),SavedMessagesActivity.class);
+		} else if (item.getItemId() == R.id.saved_messages) {
+			Intent intent = new Intent(getApplicationContext(),
+					SavedMessagesActivity.class);
 			startActivity(intent);
-			
-		}
-		else if(item.getItemId()==R.id.preset_messages)
-		{
-			Intent intent=new Intent(getApplicationContext(),PresetMessagesActivity.class);
+
+		} else if (item.getItemId() == R.id.preset_messages) {
+			Intent intent = new Intent(getApplicationContext(),
+					PresetMessagesActivity.class);
 			startActivity(intent);
-			
-		}
-		else if(item.getItemId()==R.id.create_blocklist)
-		{
-			Intent intent=new Intent(getApplicationContext(),CreateBlockListActivity.class);
+
+		} else if (item.getItemId() == R.id.create_blocklist) {
+			Intent intent = new Intent(getApplicationContext(),
+					CreateBlockListActivity.class);
 			startActivity(intent);
-			
+
+		} else if (item.getItemId() == R.id.fb_frined_birthdays) {
+			Intent intent = new Intent(getApplicationContext(),
+					Facebook__Login_Activity.class);
+			startActivity(intent);
+
 		}
-		
-		
 
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void setAlarm() {
+
+		//if (!isAlarmSet()) {
+			AlarmManager alarmManager = (AlarmManager) this
+					.getSystemService(Context.ALARM_SERVICE);
+			Intent intent = new Intent(getApplicationContext(),
+					AlarmReceiver.class);
+			PendingIntent alarmIntent = PendingIntent.getBroadcast(
+					getApplicationContext(), 0, intent, 0);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			calendar.set(Calendar.HOUR_OF_DAY,00);
+			calendar.set(Calendar.MINUTE, 02);
+			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+					calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, alarmIntent);
+
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(NewMessageActivity.this)
+					.edit();
+			editor.putString("alarm", "1");
+			editor.commit();
+			toast("alarm is set now");
+
+		//}
+
+	}
+
+	private boolean isAlarmSet() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(NewMessageActivity.this);
+		String isAlarm = prefs.getString("alarm", "-1");
+		if (isAlarm.equals("-1"))
+			return false;
+		else
+			return true;
+
+	}
+
+	private void toast(String str) {
+		Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
+	}
+
+	// test
+	
 }

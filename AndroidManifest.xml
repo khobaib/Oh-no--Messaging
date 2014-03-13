@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ohnomessaging"
     android:versionCode="17"
-    android:versionName="0.2.0" >
+    android:versionName="0.3.1" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -49,7 +50,17 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.smartengine.ohnomessaging.receiver.AlarmReceiver" android:enabled="true">
+        <receiver
+            android:name="com.smartengine.ohnomessaging.receiver.AlarmReceiver"
+            android:enabled="true" >
+        </receiver>
+        <receiver
+            android:name="com.smartengine.ohnomessaging.receiver.BootReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" >
+                </action>
+            </intent-filter>
         </receiver>
 
         <activity
@@ -60,9 +71,23 @@
             android:name="com.smartengine.ohnomessaging.QuickReplyActivity"
             android:theme="@style/DialogTheme" >
         </activity>
-        <activity android:name="com.smartengine.ohnomessaging.SavedMessagesActivity"></activity>
-        <activity android:name="com.smartengine.ohnomessaging.PresetMessagesActivity"></activity>
-        <activity android:name="com.smartengine.ohnomessaging.CreateBlockListActivity"></activity>
+        <activity android:name="com.smartengine.ohnomessaging.SavedMessagesActivity" >
+        </activity>
+        <activity android:name="com.smartengine.ohnomessaging.PresetMessagesActivity" >
+        </activity>
+        <activity android:name="com.smartengine.ohnomessaging.CreateBlockListActivity" >
+        </activity>
+        <activity android:name="com.smartengine.ohnomessaging.Facebook__Login_Activity" >
+        </activity>
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:label="@string/app_name" />
+        <activity android:name="com.smartengine.ohnomessaging.BirthDayPopUpActivity" >
+        </activity>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
     </application>
 
 </manifest>

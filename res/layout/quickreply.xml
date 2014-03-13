@@ -4,13 +4,21 @@
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_background"
     android:orientation="vertical" >
-
+<TextView
+        android:id="@+id/textViewsendtoName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp" />
     <TextView
         android:id="@+id/textViewsendto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="To"
         android:textSize="25sp" />
+     <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="#2050ff" />
 
     <EditText
         android:id="@+id/editTextmsg"

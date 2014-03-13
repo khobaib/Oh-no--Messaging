@@ -71,7 +71,7 @@ public class InboxActivity extends Activity {
 		BugSenseHandler.initAndStartSession(this, Constants.BUGSENSE_API_KEY);
 
 		setContentView(R.layout.activity_inbox);
-		setAlarm();
+		//setAlarm();
 		initViews();
 
 	}
@@ -569,41 +569,5 @@ public class InboxActivity extends Activity {
 		Intent i = new Intent(InboxActivity.this, NewMessageActivity.class);
 		startActivity(i);
 	}
-	private void setAlarm()
-	{
-		
-		//if(!isAlarmSet())
-		//{
-			AlarmManager alarmManager=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-			Intent intent=new Intent(getApplicationContext(),AlarmReceiver.class);
-			PendingIntent alarmIntent=PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
-			Calendar calendar=Calendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis());
-			calendar.set(Calendar.HOUR_OF_DAY,18);
-			calendar.set(Calendar.MINUTE,18);
-			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),1000*60,alarmIntent);
-			
-			SharedPreferences.Editor editor = PreferenceManager
-					.getDefaultSharedPreferences(InboxActivity.this)
-					.edit();
-			editor.putString("alarm", "1");
-			editor.commit();
-			toast("alarm is set now");
-			
-		//}
-		
-	}
-	private  boolean isAlarmSet()
-	{
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(InboxActivity.this);
-		String isAlarm = prefs.getString("alarm" ,"-1");
-		if(isAlarm.equals("-1"))
-			return false;
-		else
-			return true;
-		
-		
-	}
-
+	
 }

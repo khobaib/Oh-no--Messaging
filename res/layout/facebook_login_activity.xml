@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Facebook_friend_login_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/buttonfacebooklogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Facebook Login" />
+    <Button
+        android:id="@+id/buttongetbirthdays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="Get BirthDays" />
+
+    <Button
+        android:id="@+id/buttonshowfriendbirthdays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Friend Birthdays" />
+
+</LinearLayout>

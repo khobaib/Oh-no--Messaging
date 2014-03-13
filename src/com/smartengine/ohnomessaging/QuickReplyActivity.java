@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 public class QuickReplyActivity extends Activity implements OnClickListener{
 	private TextView txtsendto;
+	private TextView txtname;
 	private EditText edtmsg;
 	private Button btnsend,btnPreset;
 	String number="";
@@ -40,6 +41,7 @@ public class QuickReplyActivity extends Activity implements OnClickListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.quickreply);
 		txtsendto=(TextView)findViewById(R.id.textViewsendto);
+		txtname=(TextView)findViewById(R.id.textViewsendtoName);
 		edtmsg=(EditText)findViewById(R.id.editTextmsg);
 		btnsend=(Button)findViewById(R.id.buttonsend);
 		btnPreset=(Button)findViewById(R.id.buttonPreset);
@@ -49,6 +51,7 @@ public class QuickReplyActivity extends Activity implements OnClickListener{
 		Intent intent=getIntent();
 		number=intent.getStringExtra("number");
 		txtsendto.setText("To: "+number);
+		txtname.setText(intent.getStringExtra("name"));
 	}
 	@Override
 	public void onClick(View v) {

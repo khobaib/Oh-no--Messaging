@@ -5,4 +5,5 @@
     android:layout_height="wrap_content"
     android:textColor="#2020ff"
     android:textSize="20sp"
+    android:minHeight="50dp"
     android:textStyle="italic" />
