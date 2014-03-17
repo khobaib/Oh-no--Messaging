@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FriendBirthDayList extends ArrayAdapter<Friend> {
@@ -29,6 +30,7 @@ public class FriendBirthDayList extends ArrayAdapter<Friend> {
 
 		TextView name;
 		TextView birthdyay;
+		ImageView imageView;
 
 	}
 
@@ -45,6 +47,7 @@ public class FriendBirthDayList extends ArrayAdapter<Friend> {
 					.findViewById(R.id.textViewname);
 			holder.birthdyay = (TextView) convertView
 					.findViewById(R.id.textViewNumber);
+			holder.imageView=(ImageView)convertView.findViewById(R.id.imageView1);
 			convertView.setTag(holder);
 
 		} else
@@ -53,6 +56,7 @@ public class FriendBirthDayList extends ArrayAdapter<Friend> {
 		Friend friend = getItem(position);
 		holder.name.setText(friend.getName());
 		holder.birthdyay.setText(friend.getBirthDay());
+		holder.imageView.setVisibility(View.GONE);
 
 		return convertView;
 	}

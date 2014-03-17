@@ -222,6 +222,23 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		db.close();
 		return list;
 	}
+	public ArrayList<Contact> getFriendBirthDays2()
+	{
+		ArrayList<Contact> list = new ArrayList<Contact>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		String[] colums = { "name", "uid", "birthday" };
+		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
+				null, null, null);
+		while (cursor.moveToNext()) {
+			Contact contact=new Contact();
+			contact.setDisplayName(cursor.getString(0));
+			contact.setPhoneNumber(cursor.getString(2));
+			list.add(contact);
+		}
+		cursor.close();
+		db.close();
+		return list;
+	}
 
 	public void deleteAllRecordsFromBirthdays() {
 		SQLiteDatabase db = this.getWritableDatabase();

@@ -48,7 +48,7 @@ public class BootReceiver extends BroadcastReceiver{
 					.edit();
 			editor.putString("alarm", "1");
 			editor.commit();
-			toast("alarm is set now");
+			//toast("alarm is set now");
 
 		//}
 

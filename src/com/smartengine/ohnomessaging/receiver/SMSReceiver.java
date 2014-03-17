@@ -40,7 +40,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Toast.makeText(context, "sms received", Toast.LENGTH_LONG).show();
+		//Toast.makeText(context, "sms received", Toast.LENGTH_LONG).show();
 		this.context = context;
 		// showPopUp(intent);
 		Intent popup = new Intent(context, SMSPopupActivity.class);

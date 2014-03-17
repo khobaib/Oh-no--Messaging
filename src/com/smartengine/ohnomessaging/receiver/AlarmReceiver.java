@@ -29,7 +29,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 
 		this.context = context;
-		toast("alarm Received");
+		//toast("alarm Received");
 		Time time = new Time();
 		time.setToNow();
 
@@ -46,7 +46,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 				| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 		popup.putStringArrayListExtra("friend",list);
 		context.startActivity(popup);
-		toast(""+list.size());
+		//toast(""+list.size());
 		}
 		
 

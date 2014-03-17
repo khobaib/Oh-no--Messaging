@@ -14,12 +14,15 @@ import com.facebook.HttpMethod;
 import com.facebook.LoggingBehavior;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.Session.OpenRequest;
+import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.model.GraphObject;
 import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.ContactListadapter;
 import com.smartengine.ohnomessaging.adapter.FriendBirthDayList;
+import com.smartengine.ohnomessaging.comparator.SortContactsByName;
 import com.smartengine.ohnomessaging.comparator.SortFbFriendByName;
 import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.Contact;
@@ -34,14 +37,18 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
@@ -59,16 +66,16 @@ public class Facebook__Login_Activity extends Activity {
 		setContentView(R.layout.facebook_login_activity);
 		btnLoginlogout = (Button) findViewById(R.id.buttonfacebooklogin);
 		btnShowFreindBirthDays = (Button) findViewById(R.id.buttonshowfriendbirthdays);
-		btngetFriends=(Button)findViewById(R.id.buttongetbirthdays);
+		btngetFriends = (Button) findViewById(R.id.buttongetbirthdays);
 		btngetFriends.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				//pdiaDialog=new ProgressDialog(getApplicationContext());
-				//pdiaDialog.setTitle("Fetching Friend BirthDays");
-				//pdiaDialog.show();
+				// pdiaDialog=new ProgressDialog(getApplicationContext());
+				// pdiaDialog.setTitle("Fetching Friend BirthDays");
+				// pdiaDialog.show();
 				getFrinedsBirthDays();
-				
+
 			}
 		});
 		btnShowFreindBirthDays.setOnClickListener(new OnClickListener() {
@@ -77,6 +84,7 @@ public class Facebook__Login_Activity extends Activity {
 			public void onClick(View v) {
 
 				showDialog();
+				//showDialogTEst();
 
 			}
 		});
@@ -154,7 +162,8 @@ public class Facebook__Login_Activity extends Activity {
 		// Session.NewPermissionsRequest newPermissionsRequest=new
 		// Session.NewPermissionsRequest(this,Arrays.asList("friends_birthday"));
 		// session.requestNewReadPermissions(newPermissionsRequest);
-		final ProgressDialog pd = new ProgressDialog(Facebook__Login_Activity.this);
+		final ProgressDialog pd = new ProgressDialog(
+				Facebook__Login_Activity.this);
 		pd.setMessage("loading");
 		pd.show();
 		String fqlQuery = "select uid, name,birthday, is_app_user from user where uid in (select uid2 from friend where uid1 = me())";
@@ -179,23 +188,29 @@ public class Facebook__Login_Activity extends Activity {
 								// list.add(jObject.getString("name")+jObject.get("birthday"));
 								Log.v("info", jObject.getString("name")
 										+ jObject.get("birthday"));
-								if(!jObject.getString("birthday").equals("null") && !jObject.getString("birthday").equals(""))
-									list.add(new Friend(jObject.getString("name"),jObject.getString("uid"),jObject.getString("birthday")));
-								
+								if (!jObject.getString("birthday").equals(
+										"null")
+										&& !jObject.getString("birthday")
+												.equals(""))
+									list.add(new Friend(jObject
+											.getString("name"), jObject
+											.getString("uid"), jObject
+											.getString("birthday")));
 
 							}
 						} catch (JSONException e) {
-							
+
 							e.printStackTrace();
 						}
-						
+
 						Log.v("birthdays", response.toString());
-						Log.v("birthdays", ""+list.size());
-						SavedMessageDatabase smDatabase=new SavedMessageDatabase(Facebook__Login_Activity.this);
+						Log.v("birthdays", "" + list.size());
+						SavedMessageDatabase smDatabase = new SavedMessageDatabase(
+								Facebook__Login_Activity.this);
 						smDatabase.deleteAllRecordsFromBirthdays();
 						smDatabase.insertBirthDays(list);
 						setAlarm(getApplicationContext());
-						toast("saved in database");
+						//toast("saved in database");
 						pd.dismiss();
 						// showDialog();
 
@@ -208,8 +223,10 @@ public class Facebook__Login_Activity extends Activity {
 		Session session = Session.getActiveSession();
 
 		if (!session.isOpened() && !session.isClosed()) {
-			session.openForRead(new Session.OpenRequest(this)
-					.setCallback(statusCallback));
+			OpenRequest openRequest = new Session.OpenRequest(this);
+			openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+			openRequest.setPermissions("friends_birthday");
+			session.openForRead(openRequest.setCallback(statusCallback));
 		} else {
 			Session.openActiveSession(this, true, statusCallback);
 		}
@@ -226,74 +243,79 @@ public class Facebook__Login_Activity extends Activity {
 		@Override
 		public void call(Session session, SessionState state,
 				Exception exception) {
-			if (!session.getPermissions().contains("friends_birthday")
-					&& session.isOpened()) {
-				Toast.makeText(getApplicationContext(),"no birthday persmiion",Toast.LENGTH_LONG).show();
-				Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(
-						Facebook__Login_Activity.this,
-						Arrays.asList("friends_birthday"));
-				session.requestNewReadPermissions(newPermissionsRequest);
-			}
+
 			updateViwes();
 		}
 	}
 
 	public void showDialog() {
-		SavedMessageDatabase smDatabase=new SavedMessageDatabase(Facebook__Login_Activity.this);
-		ArrayList<Friend> flist=smDatabase.getFriendBirthDays();
-		Collections.sort(flist,new SortFbFriendByName());
 		final Dialog dialog = new Dialog(Facebook__Login_Activity.this);
 		dialog.setContentView(R.layout.list_view_contact);
-		dialog.setTitle("Friends");
-		ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
+		dialog.setTitle("Friend BirthDays");
+		SavedMessageDatabase smDatabase = new SavedMessageDatabase(
+				Facebook__Login_Activity.this);
+		//final ArrayList<Friend> flist = smDatabase.getFriendBirthDays();
+		ArrayList<Contact> flist=smDatabase.getFriendBirthDays2();
+		Collections.sort(flist, new SortContactsByName());
 		
-		 FriendBirthDayList adapter = new FriendBirthDayList(
-				getApplicationContext(), R.layout.list_view_contact_row,flist);
+		ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
+		AutoCompleteTextView atv=(AutoCompleteTextView)dialog.findViewById(R.id.autoCompleteTextViewSearch);
+		//atv.setVisibility(View.GONE);
+		/*FriendBirthDayList adapter = new FriendBirthDayList(
+				getApplicationContext(), R.layout.list_view_contact_row, flist);*/
+		ContactListadapter adapter = new ContactListadapter(
+				getApplicationContext(), R.layout.list_view_contact_row,
+				flist);
+	
+		
 		listView.setAdapter(adapter);
+		atv.setThreshold(1);
+		atv.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+
 				dialog.dismiss();
-				
+
 			}
-			
+
 		});
 		dialog.show();
 
 	}
+
 	private void toast(String str) {
 		Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
 	}
+
 	private void setAlarm(Context context) {
 
-		//if (!isAlarmSet()) {
-			AlarmManager alarmManager = (AlarmManager) context
-					.getSystemService(Context.ALARM_SERVICE);
-			Intent intent = new Intent(context,
-					AlarmReceiver.class);
-			PendingIntent alarmIntent = PendingIntent.getBroadcast(
-					context, 0, intent, 0);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis());
-			calendar.set(Calendar.HOUR_OF_DAY, 00);
-			calendar.set(Calendar.MINUTE, 02);
-			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-					calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, alarmIntent);
+		// if (!isAlarmSet()) {
+		AlarmManager alarmManager = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+		Intent intent = new Intent(context, AlarmReceiver.class);
+		PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0,
+				intent, 0);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		calendar.set(Calendar.HOUR_OF_DAY, 00);
+		calendar.set(Calendar.MINUTE, 02);
+		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+				calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY,
+				alarmIntent);
 
-			SharedPreferences.Editor editor = PreferenceManager
-					.getDefaultSharedPreferences(context)
-					.edit();
-			editor.putString("alarm", "1");
-			editor.commit();
-			toast("alarm is set now");
+		SharedPreferences.Editor editor = PreferenceManager
+				.getDefaultSharedPreferences(context).edit();
+		editor.putString("alarm", "1");
+		editor.commit();
+		// toast("alarm is set now");
 
-		//}
+		// }
 
 	}
-
+	
 	private boolean isAlarmSet() {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -304,6 +326,6 @@ public class Facebook__Login_Activity extends Activity {
 			return true;
 
 	}
-
 	
+
 }

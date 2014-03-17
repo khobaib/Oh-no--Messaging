@@ -42,6 +42,8 @@ public class BirthDayPopUpActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				Intent intent=new Intent(getApplicationContext(),NewMessageActivity.class);
+				startActivity(getIntent());
 
 			}
 
