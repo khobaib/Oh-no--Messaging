@@ -46,7 +46,7 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		sql = "create table " + friendbirthdays + "(" + "_id "
 				+ "INTEGER PRIMARY KEY AUTOINCREMENT," + " name " + " TEXT ,"
 				+ " phone " + " TEXT, " + " uid " + "TEXT, " + "birthday "
-				+ " TEXT" + ")";
+				+ " TEXT," +" profilepic "+" TEXT"+ ")";
 
 		db.execSQL(sql);
 
@@ -203,6 +203,7 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 			values.put("name", list.get(i).getName());
 			values.put("uid", list.get(i).getUid());
 			values.put("birthday", list.get(i).getBirthDay());
+			values.put("profilepic",list.get(i).getPicUrl());
 			db.insert(friendbirthdays, null, values);
 		}
 		db.close();
@@ -211,12 +212,12 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 	public ArrayList<Friend> getFriendBirthDays() {
 		ArrayList<Friend> list = new ArrayList<Friend>();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String[] colums = { "name", "uid", "birthday" };
+		String[] colums = { "name", "uid", "birthday","profilepic"};
 		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
 				null, null, null);
 		while (cursor.moveToNext()) {
 			list.add(new Friend(cursor.getString(0), cursor.getString(1),
-					cursor.getString(2)));
+					cursor.getString(2),cursor.getString(3)));
 		}
 		cursor.close();
 		db.close();

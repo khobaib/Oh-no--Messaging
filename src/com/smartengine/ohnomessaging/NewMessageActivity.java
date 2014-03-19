@@ -95,7 +95,7 @@ public class NewMessageActivity extends Activity implements
 		// strContacts = null;
 		// phoneNumbers = new ArrayList<String>();
 		// setAlarm();
-
+		
 		defaultUserPic = BitmapFactory.decodeResource(getResources(),
 				R.drawable.ic_contact_picture2);
 
@@ -113,6 +113,8 @@ public class NewMessageActivity extends Activity implements
 
 		// contactNos = (ContactsEditText) findViewById(R.id.act_to);
 		MessageBody = (EditText) findViewById(R.id.et_msg_body);
+		
+		setSavedMessage();
 
 		tvSendTo = (TextView) findViewById(R.id.tv_send_to);
 		ivSendTo = (ImageView) findViewById(R.id.iv_send_to);
@@ -527,6 +529,16 @@ public class NewMessageActivity extends Activity implements
 			dialog.show();
 			
 		}
+		
+	}
+	public void setSavedMessage()
+	{
+	
+		
+		Intent intent=getIntent();
+		long flag=intent.getLongExtra("flag",0);
+		if(flag==1)
+			MessageBody.setText(intent.getStringExtra("msg"));
 		
 	}
 }

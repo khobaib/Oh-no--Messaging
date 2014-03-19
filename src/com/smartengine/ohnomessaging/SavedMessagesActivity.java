@@ -8,7 +8,9 @@ import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -36,6 +38,21 @@ public class SavedMessagesActivity  extends Activity{
 				showDeleteDialog(msgList.get(position));
 				
 				return false;
+			}
+		});
+		listmsg.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position,
+					long id) {
+				String msg=msgList.get(position);
+				Intent  intent=new Intent(getApplicationContext(),NewMessageActivity.class);
+				intent.putExtra("msg", msg);
+				intent.putExtra("flag",(long)1);
+				Log.v("data", msg);
+				startActivity(intent);
+				
+				
 			}
 		});
 	}

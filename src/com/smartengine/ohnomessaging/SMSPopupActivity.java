@@ -3,19 +3,24 @@ package com.smartengine.ohnomessaging;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +41,9 @@ public class SMSPopupActivity extends Activity implements OnClickListener {
 	int mid = 0;
 	long threadid;
 	String msgBody;
-
+	long contactId=-1;
+	Bitmap defaultUserPic;
+	ImageView imageview;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,6 +55,11 @@ public class SMSPopupActivity extends Activity implements OnClickListener {
 		btnClose = (Button) findViewById(R.id.buttonclose);
 		btnReply = (Button) findViewById(R.id.buttonreply);
 		btnDelete = (Button) findViewById(R.id.buttondelete);
+		imageview=(ImageView)findViewById(R.id.imageView);
+
+		defaultUserPic = BitmapFactory.decodeResource(getResources(),
+				R.drawable.ic_contact_picture2);
+
 		Intent intent = getIntent();
 		smsmsg = intent.getStringArrayListExtra("msg");
 		txtNumber.setText(smsmsg.get(0));
@@ -76,7 +88,9 @@ public class SMSPopupActivity extends Activity implements OnClickListener {
 			if(smsmsg.get(0).contains(phoneNumber))
 			{
 				Log.v("phone",phoneNumber);
+				contactId = phones.getLong(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
 				txtName.setText(name);
+				imageview.setImageBitmap(getContactPhoto(contactId));
 				break;
 			}
 
@@ -85,7 +99,32 @@ public class SMSPopupActivity extends Activity implements OnClickListener {
 
 
 	}
-
+	public Bitmap getContactPhoto(long contactId) {
+		if (contactId == -1)
+			return defaultUserPic;
+		Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI,
+				contactId);
+		Uri photoUri = Uri.withAppendedPath(contactUri,
+				Contacts.Photo.CONTENT_DIRECTORY);
+		Cursor cursor = this.getContentResolver().query(photoUri,
+				new String[] { Contacts.Photo.PHOTO }, null, null, null);
+		if (cursor == null) {
+			return null;
+		}
+		try {
+			Bitmap thumbnail = defaultUserPic;
+			if (cursor.moveToFirst()) {
+				byte[] data = cursor.getBlob(0);
+				if (data != null) {
+					thumbnail = BitmapFactory.decodeByteArray(data, 0,
+							data.length);
+				}
+			}
+			return thumbnail;
+		} finally {
+			cursor.close();
+		}
+	}
 	@Override
 	public void onClick(View v) {
 
@@ -99,6 +138,7 @@ public class SMSPopupActivity extends Activity implements OnClickListener {
 			new MarkSMSAsRead().execute();
 			intent.putExtra("number", smsmsg.get(0));
 			intent.putExtra("name",txtName.getText().toString());
+			intent.putExtra("id",contactId);
 			startActivity(intent);
 
 		} else if (v.getId() == R.id.buttondelete) {
@@ -218,6 +258,31 @@ public class SMSPopupActivity extends Activity implements OnClickListener {
 
 		}
 
+	}
+	public long getContactId(String phone) {
+
+		long  contactId=-1;
+		Cursor phones = getContentResolver().query(
+				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+				null, null);
+		while (phones.moveToNext()) {
+	
+			String name = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			String phoneNumber = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+			if(phone.contains(phoneNumber))
+			{
+				contactId = phones.getLong(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+			}
+			
+
+		}
+		phones.close();
+
+		return contactId;
 	}
 
 }

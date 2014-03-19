@@ -4,11 +4,15 @@ import java.util.List;
 
 import com.ohnomessaging.R;
 
+import com.smartengine.ohnomessaging.Facebook__Login_Activity;
+import com.smartengine.ohnomessaging.lazylist.ImageLoader;
 import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.model.Friend;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +60,10 @@ public class FriendBirthDayList extends ArrayAdapter<Friend> {
 		Friend friend = getItem(position);
 		holder.name.setText(friend.getName());
 		holder.birthdyay.setText(friend.getBirthDay());
-		holder.imageView.setVisibility(View.GONE);
+		ImageLoader imageLoader=new ImageLoader(getContext());
+		Log.v("url",friend.getPicUrl());
+		//holder.imageView.setImageURI(Uri.parse(friend.getPicUrl()));
+		imageLoader.DisplayImage(friend.getPicUrl(),holder.imageView);
 
 		return convertView;
 	}

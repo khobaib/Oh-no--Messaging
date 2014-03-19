@@ -2,46 +2,59 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background"
-    android:orientation="vertical" >
+    android:background="@android:color/background_dark"
+    android:minWidth="80dp"
+    android:orientation="vertical"
+    android:padding="10dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <QuickContactBadge
-            android:id="@+id/quickContactBadge1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_contact_picture2" />
 
         <TextView
             android:id="@+id/textcnatctname"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="30sp" />
+            android:paddingLeft="8dp"
+            android:textSize="30sp"
+            android:textStyle="bold" />
     </LinearLayout>
-
-   
 
     <TextView
         android:id="@+id/textcnatctnumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="30sp" />
-     <View
         android:layout_width="match_parent"
-        android:layout_height="5dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
         android:background="#2050ff" />
 
-    <TextView
-        android:id="@+id/txtmsg"
+    <ScrollView
+        android:id="@+id/wraper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="100dp"
-        android:textSize="25sp" />
+        android:layout_height="150dp" 
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/txtmsg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:minHeight="100dp"
+            android:textSize="25sp" />
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,7 +64,7 @@
 
         <Button
             android:id="@+id/buttonclose"
-            style="?android:attr/buttonStyleSmall"
+            style="@style/ButtonBarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -59,7 +72,7 @@
 
         <Button
             android:id="@+id/buttonreply"
-            style="?android:attr/buttonStyleSmall"
+            style="@style/ButtonBarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -67,7 +80,7 @@
 
         <Button
             android:id="@+id/buttondelete"
-            style="?android:attr/buttonStyleSmall"
+            style="@style/ButtonBarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

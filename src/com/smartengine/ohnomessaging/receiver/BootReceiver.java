@@ -29,7 +29,7 @@ public class BootReceiver extends BroadcastReceiver{
 	}
 	private void setAlarm(Context context) {
 
-		//if (!isAlarmSet()) {
+		if (isAlarmSet()) {
 			AlarmManager alarmManager = (AlarmManager) context
 					.getSystemService(Context.ALARM_SERVICE);
 			Intent intent = new Intent(context,
@@ -50,7 +50,7 @@ public class BootReceiver extends BroadcastReceiver{
 			editor.commit();
 			//toast("alarm is set now");
 
-		//}
+		}
 
 	}
 
@@ -68,7 +68,7 @@ public class BootReceiver extends BroadcastReceiver{
 	private void toast(String str) {
 		Toast.makeText(context, str, Toast.LENGTH_LONG).show();
 	}
-
+	
 	// test
 
 }

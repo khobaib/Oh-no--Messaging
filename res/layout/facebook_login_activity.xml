@@ -4,12 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/Facebook_friend_login_text"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
         android:id="@+id/buttonfacebooklogin"
@@ -21,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:text="Get BirthDays" />
+        android:text="Syncronize Friend BirthDays" />
 
     <Button
         android:id="@+id/buttonshowfriendbirthdays"

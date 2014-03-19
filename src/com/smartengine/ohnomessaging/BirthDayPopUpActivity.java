@@ -29,7 +29,7 @@ public class BirthDayPopUpActivity extends Activity {
 		list = intent.getStringArrayListExtra("friend");
 		for (int i = 0; i < list.size(); i++) {
 			String[] str = list.get(i).split(",");
-			friends.add(new Friend(str[0], "", str[1]));
+			friends.add(new Friend(str[0], "", str[1],""));
 			Log.v("msg",list.get(i));
 		}
 

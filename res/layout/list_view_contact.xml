@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search" >
+
+        <requestFocus />
+    </AutoCompleteTextView>
+
     <ListView
         android:id="@+id/lc_contacts"
         android:layout_width="match_parent"

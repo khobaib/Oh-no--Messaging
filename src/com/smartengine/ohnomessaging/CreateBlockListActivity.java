@@ -61,7 +61,7 @@ public class CreateBlockListActivity extends Activity implements OnClickListener
 		AlertDialog Alert = new AlertDialog.Builder(CreateBlockListActivity.this)
 				.create();
 		Alert.setTitle("Delete");
-		Alert.setMessage("Want to delete this text thread?");
+		Alert.setMessage("Want to delete this Contact from Blocklist?");
 
 		Alert.setButton(BUTTON_POSITIVE, "Delete",
 				new DialogInterface.OnClickListener() {

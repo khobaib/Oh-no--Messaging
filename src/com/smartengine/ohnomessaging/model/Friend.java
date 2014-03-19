@@ -6,10 +6,12 @@ public class Friend{
 	private String name;
 	private String uid;
 	private String birthDay;
-	public Friend(String name, String uid, String brthday) {
+	private String picurl;
+	public Friend(String name, String uid, String brthday,String purl) {
 		this.name=name;
 		this.uid=uid;
 		this.birthDay=brthday;
+		this.picurl=purl;
 		
 	}
 	public void setName(String name)
@@ -24,6 +26,10 @@ public class Friend{
 	{
 		this.birthDay=birthDay;
 	}
+	public void setPicUrl(String url)
+	{
+		this.setPicUrl(url);
+	}
 	public String getName()
 	{
 		return this.name;
@@ -36,5 +42,11 @@ public class Friend{
 	{
 		return this.birthDay;
 	}
+	public String getPicUrl()
+	{
+		return this.picurl;
+	}
+	 @Override
+	    public String toString() { return name; }
 
 }

@@ -166,7 +166,7 @@ public class Facebook__Login_Activity extends Activity {
 				Facebook__Login_Activity.this);
 		pd.setMessage("loading");
 		pd.show();
-		String fqlQuery = "select uid, name,birthday, is_app_user from user where uid in (select uid2 from friend where uid1 = me())";
+		String fqlQuery = "select uid, name,birthday,pic from user where uid in (select uid2 from friend where uid1 = me())";
 		Bundle params = new Bundle();
 		params.putString("q", fqlQuery);
 
@@ -187,15 +187,14 @@ public class Facebook__Login_Activity extends Activity {
 								JSONObject jObject = (JSONObject) jarray.get(i);
 								// list.add(jObject.getString("name")+jObject.get("birthday"));
 								Log.v("info", jObject.getString("name")
-										+ jObject.get("birthday"));
+										+ jObject.get("birthday")+jObject.get("pic"));
 								if (!jObject.getString("birthday").equals(
 										"null")
 										&& !jObject.getString("birthday")
 												.equals(""))
 									list.add(new Friend(jObject
-											.getString("name"), jObject
-											.getString("uid"), jObject
-											.getString("birthday")));
+											.getString("name"),"", jObject
+											.getString("birthday"),jObject.getString("pic")));
 
 							}
 						} catch (JSONException e) {
@@ -254,18 +253,18 @@ public class Facebook__Login_Activity extends Activity {
 		dialog.setTitle("Friend BirthDays");
 		SavedMessageDatabase smDatabase = new SavedMessageDatabase(
 				Facebook__Login_Activity.this);
-		//final ArrayList<Friend> flist = smDatabase.getFriendBirthDays();
-		ArrayList<Contact> flist=smDatabase.getFriendBirthDays2();
-		Collections.sort(flist, new SortContactsByName());
+		final ArrayList<Friend> flist = smDatabase.getFriendBirthDays();
+		//ArrayList<Contact> flist=smDatabase.getFriendBirthDays2();
+		Collections.sort(flist, new SortFbFriendByName());
 		
 		ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
 		AutoCompleteTextView atv=(AutoCompleteTextView)dialog.findViewById(R.id.autoCompleteTextViewSearch);
 		//atv.setVisibility(View.GONE);
-		/*FriendBirthDayList adapter = new FriendBirthDayList(
-				getApplicationContext(), R.layout.list_view_contact_row, flist);*/
-		ContactListadapter adapter = new ContactListadapter(
+		FriendBirthDayList adapter = new FriendBirthDayList(
+				Facebook__Login_Activity.this, R.layout.list_view_contact_row, flist);
+		/*ContactListadapter adapter = new ContactListadapter(
 				getApplicationContext(), R.layout.list_view_contact_row,
-				flist);
+				flist);*/
 	
 		
 		listView.setAdapter(adapter);

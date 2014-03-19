@@ -9,16 +9,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#202020"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:textStyle="bold" 
         android:padding="20dp"
         android:gravity="center"
         android:text="Saved Messages"/>
+    <View
+                android:layout_width="fill_parent"
+                android:layout_height="0.2dp"
+                android:id="@+id/separator"
+                android:visibility="visible"
+                android:background="@android:color/darker_gray"/>
 
     <ListView
         android:id="@+id/listViewsavedMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="15dp"
         android:divider="@color/black"
         android:dividerHeight="3dp" >
     </ListView>
