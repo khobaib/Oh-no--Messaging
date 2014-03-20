@@ -4,23 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search" >
 
-    <Button
-        android:id="@+id/buttonfacebooklogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Facebook Login" />
-    <Button
-        android:id="@+id/buttongetbirthdays"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="Syncronize Friend BirthDays" />
+        <requestFocus />
+    </AutoCompleteTextView>
 
-    <Button
-        android:id="@+id/buttonshowfriendbirthdays"
+    <ListView
+        android:id="@+id/listViewfriends"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Show Friend Birthdays" />
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </LinearLayout>

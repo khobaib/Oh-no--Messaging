@@ -38,6 +38,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -59,35 +61,36 @@ public class Facebook__Login_Activity extends Activity {
 	private Session.StatusCallback statusCallback = new SessionStatusCallback();
 	ArrayList<Friend> list = new ArrayList<Friend>();
 	ProgressDialog pdiaDialog;
+	private ListView listViewfiends;;
+	private AutoCompleteTextView autoComplete;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.facebook_login_activity);
-		btnLoginlogout = (Button) findViewById(R.id.buttonfacebooklogin);
-		btnShowFreindBirthDays = (Button) findViewById(R.id.buttonshowfriendbirthdays);
-		btngetFriends = (Button) findViewById(R.id.buttongetbirthdays);
-		btngetFriends.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// pdiaDialog=new ProgressDialog(getApplicationContext());
-				// pdiaDialog.setTitle("Fetching Friend BirthDays");
-				// pdiaDialog.show();
-				getFrinedsBirthDays();
-
-			}
-		});
-		btnShowFreindBirthDays.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-				showDialog();
-				//showDialogTEst();
-
-			}
-		});
+		/*
+		 * btnLoginlogout = (Button) findViewById(R.id.buttonfacebooklogin);
+		 * btnShowFreindBirthDays = (Button)
+		 * findViewById(R.id.buttonshowfriendbirthdays); btngetFriends =
+		 * (Button) findViewById(R.id.buttongetbirthdays);
+		 * btngetFriends.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) { // pdiaDialog=new
+		 * ProgressDialog(getApplicationContext()); //
+		 * pdiaDialog.setTitle("Fetching Friend BirthDays"); //
+		 * pdiaDialog.show(); getFrinedsBirthDays();
+		 * 
+		 * } }); btnShowFreindBirthDays.setOnClickListener(new OnClickListener()
+		 * {
+		 * 
+		 * @Override public void onClick(View v) {
+		 * 
+		 * showDialog(); //showDialogTEst();
+		 * 
+		 * } });
+		 */
+		listViewfiends = (ListView) findViewById(R.id.listViewfriends);
+		autoComplete = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewSearch);
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
 		Session session = Session.getActiveSession();
@@ -105,7 +108,8 @@ public class Facebook__Login_Activity extends Activity {
 						.setCallback(statusCallback));
 			}
 		}
-		updateViwes();
+		// updateViwes();
+		UpdateUI();
 	}
 
 	@Override
@@ -134,29 +138,20 @@ public class Facebook__Login_Activity extends Activity {
 		Session.saveSession(session, outState);
 	}
 
-	public void updateViwes() {
-		Session session = Session.getActiveSession();
-		if (session.isOpened()) {
-
-			btnLoginlogout.setText("Log out");
-			btngetFriends.setVisibility(View.VISIBLE);
-			btnLoginlogout.setOnClickListener(new OnClickListener() {
-				public void onClick(View view) {
-					onClickLogout();
-				}
-			});
-		} else {
-			btnLoginlogout.setText("Log in");
-			btngetFriends.setVisibility(View.GONE);
-			btnLoginlogout.setOnClickListener(new OnClickListener() {
-				public void onClick(View view) {
-					onClickLogin();
-				}
-			});
-		}
-
-	}
-
+	/*
+	 * public void updateViwes() { Session session = Session.getActiveSession();
+	 * if (session.isOpened()) {
+	 * 
+	 * btnLoginlogout.setText("Log out");
+	 * btngetFriends.setVisibility(View.VISIBLE);
+	 * btnLoginlogout.setOnClickListener(new OnClickListener() { public void
+	 * onClick(View view) { onClickLogout(); } }); } else {
+	 * btnLoginlogout.setText("Log in"); btngetFriends.setVisibility(View.GONE);
+	 * btnLoginlogout.setOnClickListener(new OnClickListener() { public void
+	 * onClick(View view) { onClickLogin(); } }); }
+	 * 
+	 * }
+	 */
 	public void getFrinedsBirthDays() {
 		Session session = Session.getActiveSession();
 		// Session.NewPermissionsRequest newPermissionsRequest=new
@@ -164,7 +159,7 @@ public class Facebook__Login_Activity extends Activity {
 		// session.requestNewReadPermissions(newPermissionsRequest);
 		final ProgressDialog pd = new ProgressDialog(
 				Facebook__Login_Activity.this);
-		pd.setMessage("loading");
+		pd.setMessage("getting friend birthdays");
 		pd.show();
 		String fqlQuery = "select uid, name,birthday,pic from user where uid in (select uid2 from friend where uid1 = me())";
 		Bundle params = new Bundle();
@@ -186,15 +181,19 @@ public class Facebook__Login_Activity extends Activity {
 
 								JSONObject jObject = (JSONObject) jarray.get(i);
 								// list.add(jObject.getString("name")+jObject.get("birthday"));
-								Log.v("info", jObject.getString("name")
-										+ jObject.get("birthday")+jObject.get("pic"));
+								Log.v("info",
+										jObject.getString("name")
+												+ jObject.get("birthday")
+												+ jObject.get("pic"));
 								if (!jObject.getString("birthday").equals(
 										"null")
 										&& !jObject.getString("birthday")
 												.equals(""))
 									list.add(new Friend(jObject
-											.getString("name"),"", jObject
-											.getString("birthday"),jObject.getString("pic")));
+											.getString("name"), jObject
+											.getString("uid"), jObject
+											.getString("birthday"), jObject
+											.getString("pic")));
 
 							}
 						} catch (JSONException e) {
@@ -209,8 +208,9 @@ public class Facebook__Login_Activity extends Activity {
 						smDatabase.deleteAllRecordsFromBirthdays();
 						smDatabase.insertBirthDays(list);
 						setAlarm(getApplicationContext());
-						//toast("saved in database");
+						// toast("saved in database");
 						pd.dismiss();
+						populateList();
 						// showDialog();
 
 					}
@@ -218,72 +218,68 @@ public class Facebook__Login_Activity extends Activity {
 		com.facebook.Request.executeBatchAsync(request);
 	}
 
-	private void onClickLogin() {
-		Session session = Session.getActiveSession();
-
-		if (!session.isOpened() && !session.isClosed()) {
-			OpenRequest openRequest = new Session.OpenRequest(this);
-			openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
-			openRequest.setPermissions("friends_birthday");
-			session.openForRead(openRequest.setCallback(statusCallback));
-		} else {
-			Session.openActiveSession(this, true, statusCallback);
-		}
-	}
-
-	private void onClickLogout() {
-		Session session = Session.getActiveSession();
-		if (!session.isClosed()) {
-			session.closeAndClearTokenInformation();
-		}
-	}
+	/*
+	 * private void onClickLogin() { Session session =
+	 * Session.getActiveSession();
+	 * 
+	 * if (!session.isOpened() && !session.isClosed()) { OpenRequest openRequest
+	 * = new Session.OpenRequest(this);
+	 * openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+	 * openRequest.setPermissions("friends_birthday");
+	 * session.openForRead(openRequest.setCallback(statusCallback)); } else {
+	 * Session.openActiveSession(this, true, statusCallback); } }
+	 * 
+	 * private void onClickLogout() { Session session =
+	 * Session.getActiveSession(); if (!session.isClosed()) {
+	 * session.closeAndClearTokenInformation(); } }
+	 */
 
 	private class SessionStatusCallback implements Session.StatusCallback {
 		@Override
 		public void call(Session session, SessionState state,
 				Exception exception) {
 
-			updateViwes();
+			// updateViwes();
+			UpdateUI();
 		}
 	}
 
-	public void showDialog() {
-		final Dialog dialog = new Dialog(Facebook__Login_Activity.this);
-		dialog.setContentView(R.layout.list_view_contact);
-		dialog.setTitle("Friend BirthDays");
-		SavedMessageDatabase smDatabase = new SavedMessageDatabase(
-				Facebook__Login_Activity.this);
-		final ArrayList<Friend> flist = smDatabase.getFriendBirthDays();
-		//ArrayList<Contact> flist=smDatabase.getFriendBirthDays2();
-		Collections.sort(flist, new SortFbFriendByName());
-		
-		ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
-		AutoCompleteTextView atv=(AutoCompleteTextView)dialog.findViewById(R.id.autoCompleteTextViewSearch);
-		//atv.setVisibility(View.GONE);
-		FriendBirthDayList adapter = new FriendBirthDayList(
-				Facebook__Login_Activity.this, R.layout.list_view_contact_row, flist);
-		/*ContactListadapter adapter = new ContactListadapter(
-				getApplicationContext(), R.layout.list_view_contact_row,
-				flist);*/
-	
-		
-		listView.setAdapter(adapter);
-		atv.setThreshold(1);
-		atv.setAdapter(adapter);
-		listView.setOnItemClickListener(new OnItemClickListener() {
+	/*
+	 * public void showDialog() { final Dialog dialog = new
+	 * Dialog(Facebook__Login_Activity.this);
+	 * dialog.setContentView(R.layout.list_view_contact);
+	 * dialog.setTitle("Friend BirthDays"); SavedMessageDatabase smDatabase =
+	 * new SavedMessageDatabase( Facebook__Login_Activity.this); final
+	 * ArrayList<Friend> flist = smDatabase.getFriendBirthDays();
+	 * //ArrayList<Contact> flist=smDatabase.getFriendBirthDays2();
+	 * Collections.sort(flist, new SortFbFriendByName());
+	 * 
+	 * ListView listView = (ListView) dialog.findViewById(R.id.lc_contacts);
+	 * AutoCompleteTextView
+	 * atv=(AutoCompleteTextView)dialog.findViewById(R.id.autoCompleteTextViewSearch
+	 * ); //atv.setVisibility(View.GONE); FriendBirthDayList adapter = new
+	 * FriendBirthDayList( Facebook__Login_Activity.this,
+	 * R.layout.list_view_contact_row, flist); /*ContactListadapter adapter =
+	 * new ContactListadapter( getApplicationContext(),
+	 * R.layout.list_view_contact_row, flist);
+	 */
 
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-
-				dialog.dismiss();
-
-			}
-
-		});
-		dialog.show();
-
-	}
+	/*
+	 * listView.setAdapter(adapter); atv.setThreshold(1);
+	 * atv.setAdapter(adapter); listView.setOnItemClickListener(new
+	 * OnItemClickListener() {
+	 * 
+	 * @Override public void onItemClick(AdapterView<?> parent, View view, int
+	 * position, long id) {
+	 * 
+	 * dialog.dismiss();
+	 * 
+	 * }
+	 * 
+	 * }); dialog.show();
+	 * 
+	 * }
+	 */
 
 	private void toast(String str) {
 		Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
@@ -299,7 +295,7 @@ public class Facebook__Login_Activity extends Activity {
 				intent, 0);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		calendar.set(Calendar.HOUR_OF_DAY, 00);
+		calendar.set(Calendar.HOUR_OF_DAY, 12);
 		calendar.set(Calendar.MINUTE, 02);
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
 				calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY,
@@ -308,13 +304,15 @@ public class Facebook__Login_Activity extends Activity {
 		SharedPreferences.Editor editor = PreferenceManager
 				.getDefaultSharedPreferences(context).edit();
 		editor.putString("alarm", "1");
+		editor.putInt("days", 0);
 		editor.commit();
+		Log.v("alarm", "alarm is set");
 		// toast("alarm is set now");
 
 		// }
 
 	}
-	
+
 	private boolean isAlarmSet() {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -325,6 +323,79 @@ public class Facebook__Login_Activity extends Activity {
 			return true;
 
 	}
-	
+
+	public void UpdateUI() {
+		Session session = Session.getActiveSession();
+		if (session.isOpened()) {
+			SavedMessageDatabase smDatabase = new SavedMessageDatabase(
+					Facebook__Login_Activity.this);
+			list = smDatabase.getFriendBirthDays();
+			if (list.size() > 0)
+				populateList();
+			else if (hasInternet(this))
+				getFrinedsBirthDays();
+			else
+				toast("No Internet Connection");
+
+		} else if (hasInternet(this)) 
+				{
+			if (!session.isOpened() && !session.isClosed()) {
+				OpenRequest openRequest = new Session.OpenRequest(this);
+				openRequest
+						.setLoginBehavior(SessionLoginBehavior.SSO_WITH_FALLBACK);
+				openRequest.setPermissions("friends_birthday");
+				session.openForRead(openRequest.setCallback(statusCallback));
+			} else {
+				Session.openActiveSession(this, true, statusCallback);
+			}
+			
+			
+		}
+		else
+			toast("No internet Connection");
+
+	}
+
+	public void populateList() {
+		FriendBirthDayList friendListAdapter = new FriendBirthDayList(this,
+				R.layout.list_view_contact_row, list);
+		Collections.sort(list, new SortFbFriendByName());
+		listViewfiends.setAdapter(friendListAdapter);
+		autoComplete.setAdapter(friendListAdapter);
+		autoComplete.setThreshold(1);
+		// setAlarm(this);
+
+	}
+
+	public boolean checkNeyWorkConnection() {
+		Log.v("connection", "inside network connection");
+		ConnectivityManager connManager = (ConnectivityManager) this
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		NetworkInfo mobilenet = connManager
+				.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+		Log.v("connection", "" + mWifi.getState() + mobilenet.getState());
+		if (mWifi.isConnected() || mobilenet.isConnected())
+			return true;
+
+		else
+			return false;
+	}
+	 public static boolean hasInternet(Context context) {
+	        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	        if (connectivity != null){
+	            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+	            if (info != null){
+	                for (int i = 0; i < info.length; i++){
+	                    if (info[i].getState() == NetworkInfo.State.CONNECTED){
+	                        return true;
+	                    }
+	                }
+	            }
+	        }
+	        return false;
+	    }
 
 }

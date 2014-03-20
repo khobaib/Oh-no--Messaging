@@ -34,7 +34,7 @@ public class BirthDayPopUpActivity extends Activity {
 		}
 
 		FriendBirthDayList adapter = new FriendBirthDayList(
-				getApplicationContext(), R.layout.list_view_contact_row,
+				this, R.layout.list_view_contact_row,
 				friends);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {

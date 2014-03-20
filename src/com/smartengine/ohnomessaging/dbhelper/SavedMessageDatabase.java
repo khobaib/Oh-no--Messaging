@@ -1,6 +1,7 @@
 package com.smartengine.ohnomessaging.dbhelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.model.Friend;
@@ -46,7 +47,7 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		sql = "create table " + friendbirthdays + "(" + "_id "
 				+ "INTEGER PRIMARY KEY AUTOINCREMENT," + " name " + " TEXT ,"
 				+ " phone " + " TEXT, " + " uid " + "TEXT, " + "birthday "
-				+ " TEXT," +" profilepic "+" TEXT"+ ")";
+				+ " TEXT," + " profilepic " + " TEXT" + ")";
 
 		db.execSQL(sql);
 
@@ -153,18 +154,18 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		return -1;
 
 	}
-	public void deleteSavedMessage(String body)
-	{
-		SQLiteDatabase db=this.getWritableDatabase();
-		db.delete(savedmessagetable,"_id= "+getSavedMessageID(body),null);
+
+	public void deleteSavedMessage(String body) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(savedmessagetable, "_id= " + getSavedMessageID(body), null);
 		db.close();
 	}
-	public int getSavedMessageID(String body)
-	{
-		SQLiteDatabase db=this.getWritableDatabase();
-		String[] colums={"_id","msg"};
-		Cursor c = db
-				.query(savedmessagetable, colums, null, null, null, null, null);
+
+	public int getSavedMessageID(String body) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String[] colums = { "_id", "msg" };
+		Cursor c = db.query(savedmessagetable, colums, null, null, null, null,
+				null);
 		while (c.moveToNext()) {
 			if (c.getString(1).equals(body))
 				return c.getInt(0);
@@ -173,27 +174,26 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		db.close();
 		return -1;
 	}
-	public void deletePresetMessage(String body)
-	{
-		SQLiteDatabase db=this.getWritableDatabase();
-		db.delete(presetmessagetable,"_id= "+getPresetMessageID(body),null);
+
+	public void deletePresetMessage(String body) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(presetmessagetable, "_id= " + getPresetMessageID(body), null);
 		db.close();
 	}
-	public int getPresetMessageID(String body)
-	{
-		SQLiteDatabase db=this.getWritableDatabase();
-		String[] colums={"_id","msg"};
-		Cursor c = db
-				.query(presetmessagetable, colums, null, null, null, null, null);
+
+	public int getPresetMessageID(String body) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String[] colums = { "_id", "msg" };
+		Cursor c = db.query(presetmessagetable, colums, null, null, null, null,
+				null);
 		while (c.moveToNext()) {
 			if (c.getString(1).equals(body))
 				return c.getInt(0);
 		}
-		//c.close();
-		//db.close();
+		// c.close();
+		// db.close();
 		return -1;
 	}
-
 
 	public void insertBirthDays(ArrayList<Friend> list) {
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -203,7 +203,7 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 			values.put("name", list.get(i).getName());
 			values.put("uid", list.get(i).getUid());
 			values.put("birthday", list.get(i).getBirthDay());
-			values.put("profilepic",list.get(i).getPicUrl());
+			values.put("profilepic", list.get(i).getPicUrl());
 			db.insert(friendbirthdays, null, values);
 		}
 		db.close();
@@ -212,26 +212,26 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 	public ArrayList<Friend> getFriendBirthDays() {
 		ArrayList<Friend> list = new ArrayList<Friend>();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String[] colums = { "name", "uid", "birthday","profilepic"};
+		String[] colums = { "name", "uid", "birthday", "profilepic" };
 		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
 				null, null, null);
 		while (cursor.moveToNext()) {
 			list.add(new Friend(cursor.getString(0), cursor.getString(1),
-					cursor.getString(2),cursor.getString(3)));
+					cursor.getString(2), cursor.getString(3)));
 		}
 		cursor.close();
 		db.close();
 		return list;
 	}
-	public ArrayList<Contact> getFriendBirthDays2()
-	{
+
+	public ArrayList<Contact> getFriendBirthDays2() {
 		ArrayList<Contact> list = new ArrayList<Contact>();
 		SQLiteDatabase db = this.getReadableDatabase();
 		String[] colums = { "name", "uid", "birthday" };
 		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
 				null, null, null);
 		while (cursor.moveToNext()) {
-			Contact contact=new Contact();
+			Contact contact = new Contact();
 			contact.setDisplayName(cursor.getString(0));
 			contact.setPhoneNumber(cursor.getString(2));
 			list.add(contact);
@@ -282,6 +282,20 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		String[] array = birth.split(".");
 		array = array[0].split(" ");
 		return array[0];
+	}
+
+	public HashMap<String, String> getFriendList() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		String[] colums = { "name", "uid", };
+		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
+				null, null, null);
+		while (cursor.moveToNext())
+			map.put(cursor.getString(1), cursor.getString(0));
+
+		cursor.close();
+		db.close();
+		return map;
 	}
 
 }
