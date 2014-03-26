@@ -1,5 +1,8 @@
 package com.smartengine.ohnomessaging;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -18,6 +21,10 @@ import com.facebook.Session.OpenRequest;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.Settings;
+import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.Facebook;
+import com.facebook.android.FacebookError;
+import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.model.GraphObject;
 import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.adapter.ContactListadapter;
@@ -41,6 +48,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -89,6 +97,7 @@ public class Facebook__Login_Activity extends Activity {
 		 * 
 		 * } });
 		 */
+		setAlarm(getApplicationContext());
 		listViewfiends = (ListView) findViewById(R.id.listViewfriends);
 		autoComplete = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewSearch);
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
@@ -291,14 +300,15 @@ public class Facebook__Login_Activity extends Activity {
 		AlarmManager alarmManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(context, AlarmReceiver.class);
+		//toast("alarm");
 		PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0,
 				intent, 0);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		calendar.set(Calendar.HOUR_OF_DAY, 12);
+		calendar.set(Calendar.HOUR_OF_DAY,00);
 		calendar.set(Calendar.MINUTE, 02);
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY,
+				calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,
 				alarmIntent);
 
 		SharedPreferences.Editor editor = PreferenceManager
@@ -307,7 +317,7 @@ public class Facebook__Login_Activity extends Activity {
 		editor.putInt("days", 0);
 		editor.commit();
 		Log.v("alarm", "alarm is set");
-		// toast("alarm is set now");
+		//toast("alarm is set now");
 
 		// }
 
@@ -343,7 +353,7 @@ public class Facebook__Login_Activity extends Activity {
 				OpenRequest openRequest = new Session.OpenRequest(this);
 				openRequest
 						.setLoginBehavior(SessionLoginBehavior.SSO_WITH_FALLBACK);
-				openRequest.setPermissions("friends_birthday");
+				openRequest.setPermissions("friends_birthday,publish_actions");
 				session.openForRead(openRequest.setCallback(statusCallback));
 			} else {
 				Session.openActiveSession(this, true, statusCallback);
@@ -397,5 +407,6 @@ public class Facebook__Login_Activity extends Activity {
 	        }
 	        return false;
 	    }
+	
 
 }

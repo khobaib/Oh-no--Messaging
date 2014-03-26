@@ -3,6 +3,7 @@ package com.smartengine.ohnomessaging.receiver;
 import java.util.ArrayList;
 
 import com.ohnomessaging.R;
+import com.smartengine.ohnomessaging.BirthDayPopUpActivity;
 import com.smartengine.ohnomessaging.InboxActivity;
 import com.smartengine.ohnomessaging.NewMessageActivity;
 import com.smartengine.ohnomessaging.SMSPopupActivity;
@@ -14,6 +15,9 @@ import com.smartengine.ohnomessaging.utils.Constants;
 import com.smartengine.ohnomessaging.utils.SMSPopUpUtility;
 
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -65,6 +69,19 @@ public class SMSReceiver extends BroadcastReceiver {
 				toast("Is In BlockList");
 			} else
 				context.startActivity(popup);
+			//test
+			/* Intent popup1 = new Intent(context,BirthDayPopUpActivity.class);
+			 String str="";
+			 
+			PendingIntent resultPendingIntent =PendingIntent.getActivity(context,0,popup,0);
+			popup.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+			Notification noti=new Notification.Builder(context)
+			.setContentTitle("Friend Birthday").setContentText(str).setSmallIcon(R.drawable.ic_launcher).setContentIntent(resultPendingIntent)
+			.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE| Notification.DEFAULT_LIGHTS).build();
+			NotificationManager notiManager=(NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);
+			noti.flags=Notification.FLAG_AUTO_CANCEL;
+			notiManager.notify(0,noti);*/
 		}
 
 	}

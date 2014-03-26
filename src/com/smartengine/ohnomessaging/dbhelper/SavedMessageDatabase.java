@@ -202,6 +202,7 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		for (int i = 0; i < size; i++) {
 			values.put("name", list.get(i).getName());
 			values.put("uid", list.get(i).getUid());
+			
 			values.put("birthday", list.get(i).getBirthDay());
 			values.put("profilepic", list.get(i).getPicUrl());
 			db.insert(friendbirthdays, null, values);
@@ -216,8 +217,12 @@ public class SavedMessageDatabase extends SQLiteOpenHelper {
 		Cursor cursor = db.query(friendbirthdays, colums, null, null, null,
 				null, null, null);
 		while (cursor.moveToNext()) {
+			{
+				if(cursor.getString(0).equals("Shohan Al Jannat"))
+					Log.v("uid",cursor.getString(1));
 			list.add(new Friend(cursor.getString(0), cursor.getString(1),
 					cursor.getString(2), cursor.getString(3)));
+			}
 		}
 		cursor.close();
 		db.close();

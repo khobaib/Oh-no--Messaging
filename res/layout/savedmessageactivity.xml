@@ -25,9 +25,7 @@
         android:id="@+id/listViewsavedMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="15dp"
-        android:divider="@color/black"
-        android:dividerHeight="3dp" >
+        android:paddingTop="15dp">
     </ListView>
 
 </LinearLayout>

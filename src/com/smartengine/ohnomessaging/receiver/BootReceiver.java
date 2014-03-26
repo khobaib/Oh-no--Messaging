@@ -38,8 +38,8 @@ public class BootReceiver extends BroadcastReceiver{
 					context, 0, intent, 0);
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(System.currentTimeMillis());
-			calendar.set(Calendar.HOUR_OF_DAY, 00);
-			calendar.set(Calendar.MINUTE, 02);
+			calendar.set(Calendar.HOUR_OF_DAY,00);
+			calendar.set(Calendar.MINUTE,02);
 			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
 					calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, alarmIntent);
 

@@ -14,14 +14,19 @@ import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.Session.OpenRequest;
 import com.facebook.model.GraphObject;
+import com.ohnomessaging.R;
 import com.smartengine.ohnomessaging.BirthDayPopUpActivity;
-import com.smartengine.ohnomessaging.Facebook__Login_Activity;
 import com.smartengine.ohnomessaging.NewMessageActivity;
 import com.smartengine.ohnomessaging.SMSPopupActivity;
 import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
 import com.smartengine.ohnomessaging.model.Friend;
 
-import android.app.ProgressDialog;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +47,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	ArrayList<Friend> freind = new ArrayList<Friend>();
 	ArrayList<String> list;
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
@@ -57,13 +63,30 @@ public class AlarmReceiver extends BroadcastReceiver {
 		 * freind.get(i).getName() + freind.get(i).getBirthDay() +
 		 * time.monthDay); }
 		 */
+		//toast("alaram receiver");
 		if (list.size() >0) {
+			 Intent popup = new Intent(context,BirthDayPopUpActivity.class);
+			 String str="";
+			 if(list.size()==1)
+				 str="1 frined has birthday today";
+			 else
+				 str=list.size()+" frineds have birthday today";
+			PendingIntent resultPendingIntent =PendingIntent.getActivity(context,0,popup,0);
+			popup.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+			Notification noti=new Notification.Builder(context)
+			.setContentTitle("Friend Birthday").setContentText(str).setSmallIcon(R.drawable.ic_launcher).setContentIntent(resultPendingIntent)
+			.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE| Notification.DEFAULT_LIGHTS).build();
+			NotificationManager notiManager=(NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);
+			noti.flags=Notification.FLAG_AUTO_CANCEL;
+			notiManager.notify(0,noti);
+			/*
 			Intent popup = new Intent(context, BirthDayPopUpActivity.class);
 			popup.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 					| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 			popup.putStringArrayListExtra("friend", list);
 			context.startActivity(popup);
-			// toast(""+list.size());
+			// toast(""+list.size());*/
 		}
 		// test
 		checkNeyWorkConnection();
@@ -107,9 +130,18 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public void updateFriendList() {
 		Log.v("inside","updatefriendlist");
 		Session session = Session.getActiveSession();
-		if (session.isOpened()) {
-			getFrinedsBirthDayandUpdate();
+		if(session!=null)
+		{
+			if (session.isOpened()) {
+				getFrinedsBirthDayandUpdate();
+			}
+			else if(session.isClosed())
+			{
+				Log.v("sessio","closed");
+				session.openForRead(new OpenRequest((Activity)context));
+			}
 		}
+		
 
 	}
 
