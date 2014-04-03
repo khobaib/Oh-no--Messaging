@@ -14,6 +14,7 @@
         android:textColor="@drawable/button_text"
         android:onClick="onClickNewMessage"
         android:padding="15dp"
+        android:visibility="gone"
         android:text="New Message"
         android:textSize="20dp"
         android:textStyle="bold" />

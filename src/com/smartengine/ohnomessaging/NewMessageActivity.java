@@ -418,6 +418,12 @@ public class NewMessageActivity extends Activity implements
 			startActivity(intent);
 
 		}
+		 else if (item.getItemId() == R.id.inbox) {
+			 Intent i = new Intent(NewMessageActivity.this, InboxActivity.class);
+				startActivity(i);
+				finish();
+
+			}
 
 		return super.onOptionsItemSelected(item);
 	}

@@ -24,6 +24,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -41,6 +43,7 @@ import android.widget.SpinnerAdapter;
 import com.bugsense.trace.BugSenseHandler;
 
 import com.ohnomessaging.R;
+import com.smartengine.ohnomessaging.NewMessageActivity.GetContacts;
 import com.smartengine.ohnomessaging.adapter.MessageListAdapter;
 import com.smartengine.ohnomessaging.adapter.NothingSelectedSpinnerAdapter;
 import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
@@ -569,5 +572,23 @@ public class InboxActivity extends Activity {
 		Intent i = new Intent(InboxActivity.this, NewMessageActivity.class);
 		startActivity(i);
 	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.inbox, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (item.getItemId() == R.id.new_message) {
+			Intent i = new Intent(InboxActivity.this, NewMessageActivity.class);
+			startActivity(i);
+			
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
 	
 }
