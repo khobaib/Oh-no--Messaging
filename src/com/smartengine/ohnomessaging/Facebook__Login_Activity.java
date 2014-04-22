@@ -1,17 +1,29 @@
 package com.smartengine.ohnomessaging;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.HttpMethod;
 import com.facebook.LoggingBehavior;
@@ -21,46 +33,13 @@ import com.facebook.Session.OpenRequest;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.Settings;
-import com.facebook.android.AsyncFacebookRunner;
-import com.facebook.android.Facebook;
-import com.facebook.android.FacebookError;
-import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.model.GraphObject;
 import com.ohnomessaging.R;
-import com.smartengine.ohnomessaging.adapter.ContactListadapter;
 import com.smartengine.ohnomessaging.adapter.FriendBirthDayList;
-import com.smartengine.ohnomessaging.comparator.SortContactsByName;
 import com.smartengine.ohnomessaging.comparator.SortFbFriendByName;
 import com.smartengine.ohnomessaging.dbhelper.SavedMessageDatabase;
-import com.smartengine.ohnomessaging.model.Contact;
 import com.smartengine.ohnomessaging.model.Friend;
 import com.smartengine.ohnomessaging.receiver.AlarmReceiver;
-
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.Dialog;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Toast;
 
 public class Facebook__Login_Activity extends Activity {
 	private Button btnLoginlogout;
@@ -113,8 +92,7 @@ public class Facebook__Login_Activity extends Activity {
 			}
 			Session.setActiveSession(session);
 			if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-				session.openForRead(new Session.OpenRequest(this)
-						.setCallback(statusCallback));
+				session.openForRead(new Session.OpenRequest(Facebook__Login_Activity.this).setCallback(statusCallback));
 			}
 		}
 		// updateViwes();
@@ -169,6 +147,7 @@ public class Facebook__Login_Activity extends Activity {
 		final ProgressDialog pd = new ProgressDialog(
 				Facebook__Login_Activity.this);
 		pd.setMessage("getting friend birthdays");
+		pd.setCancelable(false);
 		pd.show();
 		String fqlQuery = "select uid, name,birthday,pic from user where uid in (select uid2 from friend where uid1 = me())";
 		Bundle params = new Bundle();
